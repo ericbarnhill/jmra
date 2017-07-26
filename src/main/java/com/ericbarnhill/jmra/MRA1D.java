@@ -10,6 +10,8 @@ class MRA1D extends MRA<double[], boolean[], double[]> {
     private int w;
     private int wPad;
     private int stride;
+    private double[] paddedData;
+    private boolean[] paddedMask;
 
     public MRA1D() { super(); }
 
@@ -18,6 +20,7 @@ class MRA1D extends MRA<double[], boolean[], double[]> {
         this.w = originalData.length;
         this.wPad = (int)nextPwr2(w);
         this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, wPad);
+        this.paddedMask = JVCLUtils.zeroPadBoundaries(maskData, wPad);
         this.stride = 2;
         ArrayList<Integer> LA = new ArrayList<Integer>(2);
         ArrayList<Integer> LS = new ArrayList<Integer>(2);
@@ -94,7 +97,7 @@ class MRA1D extends MRA<double[], boolean[], double[]> {
             // avoid scaling datas
             if (i % stride != 0) {
                 int level = (int)Math.floor(i / stride);
-                boolean[] maskDownsampled = ArrayMath.decimate(maskData, (int)Math.pow(2,level));
+                boolean[] maskDownsampled = ArrayMath.decimate(paddedMask, (int)Math.pow(2,level));
                 waveletData.set(i, Threshold.threshold(waveletData.get(i), maskDownsampled, threshMeth, noiseEstMeth));
             }
         }

@@ -8,7 +8,6 @@ public abstract class MRA<N, B, V> {
     // B is ND boolean array
     // V is 1D vector array of numeric type
      N originalData;
-     N paddedData;
      N scalingData;
      B maskData;
      ArrayList<N> waveletData;
@@ -58,7 +57,7 @@ public abstract class MRA<N, B, V> {
     }
     long nextPwr2(int n) {
         double logn = Math.log(n) / Math.log(2);
-        return Math.round(Math.exp(Math.ceil(logn)));
+        return (long)Math.pow(2,(int)Math.ceil(logn));
     }
     abstract N AFB(N y, V filter);
     abstract N SFB(N lo, N hi, V g0, V g1);

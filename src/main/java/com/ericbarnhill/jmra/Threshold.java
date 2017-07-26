@@ -69,7 +69,6 @@ class Threshold {
                 switch (noiseEstMeth) {
             case VISU_SHRINK:
                 sigma = universalThreshold(maskedPixels, robustNoiseEst);
-                System.out.format("sigmahat %1.4f \n", sigma);
                 break;
             case SURE_SHRINK:
                 // hybrid scheme of Donoho et al

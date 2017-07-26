@@ -24,6 +24,8 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     private int areaPad;
     private int volumePad;
     private int stride;
+    private double[][][] paddedData;
+    private boolean[][][] paddedMask;
     private MRA1D mra1d;
 
     public MRA3D(double[][][] originalData, boolean[][][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompositionLevels) {
@@ -38,8 +40,9 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         this.dPad = (int)nextPwr2(d);
         this.areaPad = wPad * hPad;
         this.volumePad = wPad * hPad * dPad;
-        this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, wPad, hPad, dPad);
-        this.stride = 4;
+        this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.paddedMask = JVCLUtils.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.stride = 8;
         ArrayList<Integer> LA = new ArrayList<Integer>(2);
         ArrayList<Integer> LS = new ArrayList<Integer>(2);
         this.L = new ArrayList<ArrayList<Integer>>();
@@ -63,7 +66,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
 
     public void dwt() {
-        scalingData = ArrayMath.deepCopy(originalData);
+        scalingData = ArrayMath.deepCopy(paddedData);
         for (int decompositionLevel = 0; decompositionLevel < decompositionLevels; decompositionLevel++) {
             decompose(scalingData, 2);
             scalingData = waveletData.get(decompositionLevel*stride);
@@ -74,7 +77,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         for (int decompositionLevel = decompositionLevels-1; decompositionLevel >= 0; decompositionLevel--) {
             recompose(decompositionLevel, 2);
         }
-        filteredData = ArrayMath.deepCopy(waveletData.get(0));
+        filteredData = JVCLUtils.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
     }
 
     void decompose(double[][][] data, int dimensionLevel) {
@@ -109,12 +112,30 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     void recompose(int decompositionLevel, int dimensionLevel) {
         int localStride = (int)Math.pow(2, 2 - dimensionLevel);
         int localPair = localStride / 2;
+        System.out.println(localStride);
         int localIndex = stride*decompositionLevel;
         for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
             double[][][] lo = waveletData.get(ind);
             double[][][] hi = waveletData.get(ind + localPair);
+            switch (localStride) {
+                case 4: 
+                    lo = ArrayMath.shiftDim(lo, 2);
+                    hi = ArrayMath.shiftDim(hi, 2);
+                    break;
+                case 2:
+                    lo = ArrayMath.shiftDim(lo, 1);
+                    hi = ArrayMath.shiftDim(hi, 1);
+                    break;
+            }
             double[][][] y = SFB(lo, hi, g0, g1);
-            y = ArrayMath.shiftDim(y);
+            switch (localStride) {
+                case 4: 
+                    y = ArrayMath.shiftDim(y, 1);
+                    break;
+                case 2:
+                    y = ArrayMath.shiftDim(y, 2);
+                    break;
+            }
             waveletData.set(ind, y);
         }
         if (dimensionLevel > 0) {
@@ -142,22 +163,26 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         for (int i = 0; i < waveletData.size(); i++) {
             // avoid scaling datas
             if (i % stride != 0) {
+                int level = (int)Math.floor(i / stride);
+                int decimFac = (int)Math.pow(2, level+1);
+                boolean[][][] maskDownsampled = ArrayMath.decimate(paddedMask, decimFac);
+                double[] waveletVec = ArrayMath.vectorize(waveletData.get(i));
+                boolean[] maskVec = ArrayMath.vectorize(maskDownsampled);
                 waveletData.set(i, 
                     ArrayMath.devectorize(
                         Threshold.threshold(
-                            ArrayMath.vectorize(
-                                waveletData.get(i)
-                            ), ArrayMath.vectorize(
-                                maskData
-                            ), threshMeth, noiseEstMeth),
-                        w, h)
+                            waveletVec, maskVec, threshMeth, noiseEstMeth)
+                        ,wPad/decimFac, hPad/decimFac)
                     );
             }
         }
     }
     // for debugging and testing
     public void data2File(double[][][] data, String path) {
-        ImageStack is = new ImageStack();
+        int w = data.length;
+        int h = data[0].length;
+        int d = data[0][0].length;
+        ImageStack is = new ImageStack(w,h);
         for (int k = 0; k < d; k++) {
             FloatProcessor fp = new FloatProcessor(w,h);
             for (int i = 0; i < w; i++) {

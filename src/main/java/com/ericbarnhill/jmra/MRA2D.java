@@ -20,6 +20,8 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     private int areaPad;
     private int stride;
     private MRA1D mra1d;
+    private double[][] paddedData;
+    private boolean[][] paddedMask;
 
     public MRA2D(double[][] originalData, boolean[][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompositionLevels) {
         super(originalData, maskData, filterBank, decompositionLevels);
@@ -29,7 +31,8 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         this.wPad = (int)nextPwr2(w);
         this.hPad = (int)nextPwr2(h);
         this.areaPad = wPad * hPad;
-        this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, wPad, hPad);
+        this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, (wPad-w)/2, (hPad-h)/2);
+        this.paddedMask = JVCLUtils.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2);
         this.stride = 4;
         ArrayList<Integer> LA = new ArrayList<Integer>(2);
         ArrayList<Integer> LS = new ArrayList<Integer>(2);
@@ -54,7 +57,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     public void dwt() {
-        scalingData = ArrayMath.deepCopy(originalData);
+        scalingData = ArrayMath.deepCopy(paddedData);
         for (int decompositionLevel = 0; decompositionLevel < decompositionLevels; decompositionLevel++) {
             decompose(scalingData, 1);
             scalingData = waveletData.get(decompositionLevel*stride);
@@ -65,7 +68,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         for (int decompositionLevel = decompositionLevels-1; decompositionLevel >= 0; decompositionLevel--) {
             recompose(decompositionLevel, 1);
         }
-        filteredData = ArrayMath.deepCopy(waveletData.get(0));
+        filteredData = JVCLUtils.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2);
     }
 
     void decompose(double[][] data, int dimensionLevel) {
@@ -102,16 +105,8 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
             double[][] lo = ArrayMath.shiftDim(waveletData.get(ind));
             double[][] hi = ArrayMath.shiftDim(waveletData.get(ind + localPair));
             double[][] y = ArrayMath.shiftDim(SFB(lo, hi, g0, g1));
-            String fileID = "/home/ericbarnhill/Documents/code/" + Integer.toString(decompositionLevel) + Integer.toString(dimensionLevel) + Integer.toString(ind);
-            String loID = fileID + "_lo.tif";
-            String hiID = fileID + "_hi.tif";
-            String yID = fileID + "_y.tif";
-            data2File(lo, loID);
-            data2File(hi, hiID);
-            data2File(y, yID);
             y = ArrayMath.shiftDim(y);
             waveletData.set(ind, y);
-            System.out.format("%d %d %d %d %d \n", lo.length, lo[0].length, y.length, y[0].length, ind);
         }
         if (dimensionLevel > 0) {
             recompose(decompositionLevel, dimensionLevel-1);
@@ -137,7 +132,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
             if (i % stride != 0) {
                 int level = (int)Math.floor(i / stride);
                 int decimFac = (int)Math.pow(2, level+1);
-                boolean[][] maskDownsampled = ArrayMath.decimate(maskData, decimFac);
+                boolean[][] maskDownsampled = ArrayMath.decimate(paddedMask, decimFac);
                 double[] waveletVec = ArrayMath.vectorize(waveletData.get(i));
                 boolean[] maskVec = ArrayMath.vectorize(maskDownsampled);
                 waveletData.set(i, 
