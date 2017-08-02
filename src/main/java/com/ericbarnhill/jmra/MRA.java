@@ -1,7 +1,12 @@
 package com.ericbarnhill.jmra; 
 import java.util.ArrayList;
 import com.ericbarnhill.arrayMath.ArrayMath;
-import com.ericbarnhill.jvcl.UpFirDn;
+import com.ericbarnhill.jvcl.*;
+import ij.io.Opener;
+import ij.io.FileSaver;
+import ij.ImagePlus;
+import ij.process.ImageProcessor;
+import ij.process.FloatProcessor;
 
 public abstract class MRA<N, B, V> {
     // N is ND array of numeric type
@@ -12,37 +17,64 @@ public abstract class MRA<N, B, V> {
      B maskData;
      ArrayList<N> waveletData;
      N filteredData;
-     int decompositionLevels; // also used for stride
-     int dimensionLevels;
-     ArrayList<ArrayList<V>> filterBank; // order h0, h1, g0, g1
+     int decompLvls; // also used for stride
+     int dimLvls;
+     int stride;
+     ArrayList<ArrayList<V>> filterBank; // order af, afh, sfl, sfh
      ArrayList<V> analysisFilters;
-     V h0;
-     V h1;
-     V g0;
-     V g1;
+     V afl;
+     V afh;
+     V sfl;
+     V sfh;
      ArrayList<V> synthesisFilters;
-     ArrayList<ArrayList<Integer>> L;
+     ConvolverFactory.ConvolutionType convolutionType;
+     UpFirDn upFirDn;
 
-     public MRA() {}
-    public MRA(N originalData, B maskData, ArrayList<ArrayList<V>> filterBank, int decompositionLevels) {
+     public MRA() {
+     }
+
+     public MRA(ConvolverFactory.ConvolutionType convolutionType) {
+        this.convolutionType =  convolutionType;
+        upFirDn = new UpFirDn(convolutionType); 
+     }
+
+    public MRA(N originalData, B maskData, ArrayList<ArrayList<V>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
         this.originalData = originalData;
         this.scalingData = originalData; 
         this.maskData = maskData;
         this.filterBank = filterBank;
         this.analysisFilters = filterBank.get(0);
-        this.h0 = analysisFilters.get(0);
-        this.h1 = analysisFilters.get(1);
+        this.afl = analysisFilters.get(0);
+        this.afh = analysisFilters.get(1);
         this.synthesisFilters = filterBank.get(1);
-        this.g0 = synthesisFilters.get(0);
-        this.g1 = synthesisFilters.get(1);
-        this.decompositionLevels = decompositionLevels;
+        this.sfl = synthesisFilters.get(0);
+        this.sfh = synthesisFilters.get(1);
+        this.decompLvls = decompLvls;
         waveletData = new ArrayList<N>();
+        this.convolutionType =  convolutionType;
+        upFirDn = new UpFirDn(convolutionType); 
     } 
 
-    public abstract void dwt();
-    public abstract void idwt();
+    void dwt() {
+        for (int decompLvl = 0; decompLvl < decompLvls; decompLvl++) {
+            decompose(decompLvl, 0);
+        }
+    }
+
+    void idwt() {
+        for (int decompLvl = decompLvls-1; decompLvl >= 0; decompLvl--) {
+            recompose(decompLvl, dimLvls-1);
+        }
+    }
+
+    abstract void decompose(int decompLvl, int dimLvl);
+    abstract void recompose(int decompLvl, int dimLvl);
+
+    abstract N AFB(N y, V filter, int decompLvl);
+    abstract N SFB(N lo, N hi, V sfl, V sfh, int decompLvl); 
+
     public abstract void threshold(Threshold.ThreshMeth threshMeth, Threshold.NoiseEstMeth noiseEstMeth);
-    abstract void decompose(N data, int recursionLevel);
+
     public ArrayList<N> getDecomposition() {
         return waveletData;
     }
@@ -55,12 +87,10 @@ public abstract class MRA<N, B, V> {
     public N getFilteredData() {
         return filteredData;
     }
+
     long nextPwr2(int n) {
         double logn = Math.log(n) / Math.log(2);
         return (long)Math.pow(2,(int)Math.ceil(logn));
     }
-    abstract N AFB(N y, V filter);
-    abstract N SFB(N lo, N hi, V g0, V g1);
-
 }
     

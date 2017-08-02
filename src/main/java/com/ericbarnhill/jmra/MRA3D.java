@@ -13,23 +13,23 @@ import ij.process.FloatProcessor;
 
 class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
 
-    private int w;
-    private int h;
-    private int d;
-    private int area;
-    private int volume;
-    private int wPad;
-    private int hPad;
-    private int dPad;
-    private int areaPad;
-    private int volumePad;
-    private int stride;
-    private double[][][] paddedData;
-    private boolean[][][] paddedMask;
-    private MRA1D mra1d;
+     int w;
+     int h;
+     int d;
+     int area;
+     int volume;
+     int wPad;
+     int hPad;
+     int dPad;
+     int areaPad;
+     int volumePad;
+     int stride;
+     double[][][] paddedData;
+     boolean[][][] paddedMask;
+     MRA1D mra1d;
 
-    public MRA3D(double[][][] originalData, boolean[][][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompositionLevels) {
-        super(originalData, maskData, filterBank, decompositionLevels);
+    public MRA3D(double[][][] originalData, boolean[][][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
+        super(originalData, maskData, filterBank, decompLvls, convolutionType);
         this.w = originalData.length;
         this.h = originalData[0].length;
         this.d = originalData[0][0].length;
@@ -40,124 +40,136 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         this.dPad = (int)nextPwr2(d);
         this.areaPad = wPad * hPad;
         this.volumePad = wPad * hPad * dPad;
-        this.paddedData = JVCLUtils.zeroPadBoundaries(originalData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
-        this.paddedMask = JVCLUtils.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.paddedData = ArrayMath.zeroPadBoundaries(originalData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.dimLvls = 3;
         this.stride = 8;
-        ArrayList<Integer> LA = new ArrayList<Integer>(2);
-        ArrayList<Integer> LS = new ArrayList<Integer>(2);
-        this.L = new ArrayList<ArrayList<Integer>>();
-        L.add(LA);
-        L.add(LS);
-        mra1d = new MRA1D();
-        setFilterLengths();
+        mra1d = new MRA1D(convolutionType);
+        initializeWaveletData();
     }
 
-    public MRA3D(double[][][] originalData, ArrayList<ArrayList<double[]>> filterBank, int decompositionLevels) {
-        this(originalData, ArrayMath.fillWithTrue(originalData.length,originalData[0].length, originalData[0][0].length), filterBank, decompositionLevels);
+    public MRA3D(double[][][] originalData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
+        this(originalData, ArrayMath.fillWithTrue(originalData.length,originalData[0].length, originalData[0][0].length), filterBank, decompLvls, convolutionType);
     }
 
-    private void setFilterLengths() {
-        this.filterBank = filterBank;
-        for (int i = 0; i < filterBank.size(); i++) {
-            for (double[] d : filterBank.get(i)) {
-                L.get(i).add(d.length);
-            }
+    void initializeWaveletData() {
+        for (int n = 0; n < stride * decompLvls; n++) {
+            waveletData.add(new double[0][][]);
         }
     }
 
-    public void dwt() {
-        scalingData = ArrayMath.deepCopy(paddedData);
-        for (int decompositionLevel = 0; decompositionLevel < decompositionLevels; decompositionLevel++) {
-            decompose(scalingData, 2);
-            scalingData = waveletData.get(decompositionLevel*stride);
-        }
-    }
-
-    public void idwt() {
-        for (int decompositionLevel = decompositionLevels-1; decompositionLevel >= 0; decompositionLevel--) {
-            recompose(decompositionLevel, 2);
-        }
-        filteredData = JVCLUtils.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
-    }
-
-    void decompose(double[][][] data, int dimensionLevel) {
-        double[][][] lo = AFB(data, h0);
-        double[][][] hi = AFB(data, h1);
-        lo = ArrayMath.shiftDim(lo);
-        hi = ArrayMath.shiftDim(hi);
-        if (dimensionLevel == 0) {
-            waveletData.add(lo);
-            waveletData.add(hi);
-        } else {
-            decompose(lo, dimensionLevel-1);
-            decompose(hi, dimensionLevel-1);
-        }
-    }
-
-    double[][][] AFB(double[][][] data, double[] filter) {
-        final int fi = data.length;
-        final int fj = data[0].length;
-        final int fk = data[0][0].length;
-        final int fk2 = fk / 2;
-        double[][][] filtData = new double[fi][fj][fk];
-        for (int i = 0; i < fi; i++) {
-            for (int j = 0; j < fj; j++) { 
-                filtData[i][j] = mra1d.AFB(data[i][j], filter);
-            }
-        }
-        return filtData;
-    }
-
-
-    void recompose(int decompositionLevel, int dimensionLevel) {
-        int localStride = (int)Math.pow(2, 2 - dimensionLevel);
+    @Override
+    void decompose(int decompLvl, int dimLvl) {
+        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
-        System.out.println(localStride);
-        int localIndex = stride*decompositionLevel;
+        int localIndex = stride*decompLvl; // starting point
+        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
+            double[][][] x = new double[0][][];
+            // figure out where the scaling image is coming from
+            if (dimLvl == 0) {
+                if (decompLvl == 0) {
+                    x = ArrayMath.deepCopy(paddedData);
+                } else {
+                    x = waveletData.get(localIndex - stride);
+                }
+            } else {
+                x = waveletData.get(ind);
+            }
+            // decompose into lo and hi
+            switch(localStride) { // shift dim for y processing. done as a switch block so higher dim code can all use the identical form
+                case 4: 
+                    x = ArrayMath.shiftDim(x, 2);
+                    break;
+                case 2:
+                    x = ArrayMath.shiftDim(x, 1);
+                    break;
+            }
+            double[][][] lo = AFB(x, afl, decompLvl);
+            double[][][] hi = AFB(x, afh, decompLvl);
+            switch(localStride) {
+                case 4: 
+                    lo = ArrayMath.shiftDim(lo, 1);
+                    hi = ArrayMath.shiftDim(hi, 1);
+                    break;
+                case 2:
+                    lo = ArrayMath.shiftDim(lo, 2);
+                    hi = ArrayMath.shiftDim(hi, 2);
+                    break;
+            }
+            waveletData.set(ind, lo);
+            waveletData.set(ind + localPair, hi);
+        }
+        if (dimLvl < dimLvls - 1) {
+            decompose(decompLvl, dimLvl+1);
+       }
+    }
+
+    @Override
+    void recompose(int decompLvl, int dimLvl) {
+        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
+        int localPair = localStride / 2;
+        int localIndex = stride*decompLvl;
         for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
             double[][][] lo = waveletData.get(ind);
             double[][][] hi = waveletData.get(ind + localPair);
             switch (localStride) {
                 case 4: 
-                    lo = ArrayMath.shiftDim(lo, 2);
-                    hi = ArrayMath.shiftDim(hi, 2);
-                    break;
-                case 2:
                     lo = ArrayMath.shiftDim(lo, 1);
                     hi = ArrayMath.shiftDim(hi, 1);
                     break;
+                case 2:
+                    lo = ArrayMath.shiftDim(lo, 2);
+                    hi = ArrayMath.shiftDim(hi, 2);
+                    break;
             }
-            double[][][] y = SFB(lo, hi, g0, g1);
+            double[][][] y = SFB(lo, hi, sfl, sfh, decompLvl);
             switch (localStride) {
                 case 4: 
-                    y = ArrayMath.shiftDim(y, 1);
+                    y = ArrayMath.shiftDim(y, 2);
                     break;
                 case 2:
-                    y = ArrayMath.shiftDim(y, 2);
+                    y = ArrayMath.shiftDim(y, 1);
                     break;
             }
             waveletData.set(ind, y);
         }
-        if (dimensionLevel > 0) {
-            recompose(decompositionLevel, dimensionLevel-1);
-        } else if (decompositionLevel > 0) {
-            waveletData.set(stride*(decompositionLevel-1), waveletData.get(stride*decompositionLevel));
+        if (dimLvl > 0) {
+            recompose(decompLvl, dimLvl-1);
+        } else if (decompLvl > 0) {
+            waveletData.set(stride*(decompLvl-1), waveletData.get(stride*decompLvl));
         }
     }
     
-    double[][][] SFB(double[][][] lo, double[][][] hi, double[] g0, double[] g1) {
+    @Override
+    double[][][] AFB(double[][][] data, double[] filter, int decompLvl) {
+        final int fi = data.length;
+        final int fj = data[0].length;
+        final int fk = data[0][0].length;
+        final int fk2 = fk / 2;
+        double[][][] filtData = new double[fi][fj][fk];
+        for (int i = 0; i < fi; i++) { 
+            for (int j = 0; j < fj; j++) {
+                filtData[i][j] = mra1d.AFB(data[i][j], filter, decompLvl); 
+            } 
+        }
+        return filtData;
+    } 
+
+    @Override
+    double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int fi = lo.length;
         final int fj = lo[0].length;
         final int fk = lo[0][0].length*2;
         double[][][] y = new double[fi][fj][fk];
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
-                y[i][j] = mra1d.SFB(lo[i][j], hi[i][j], g0, g1);
+                y[i][j] = mra1d.SFB(lo[i][j], hi[i][j], sfl, sfh, decompLvl);
             }
         }
         return y;
     }
 
+    @Override
     public void threshold(Threshold.ThreshMeth threshMeth, Threshold.NoiseEstMeth noiseEstMeth) {
         // loop through each subband, pass method
         for (int i = 0; i < waveletData.size(); i++) {
@@ -177,6 +189,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
             }
         }
     }
+   
     // for debugging and testing
     public void data2File(double[][][] data, String path) {
         int w = data.length;

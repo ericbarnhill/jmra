@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: com.ericbarnhill.jmra.TestTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.582 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestTest
+testUndecWaveletRecon(com.ericbarnhill.jmra.TestTest)  Time elapsed: 0.56 sec  <<< ERROR!
+java.lang.ArrayIndexOutOfBoundsException: 2269
+	at com.ericbarnhill.jmra.MRA2DU.SFBU(MRA2DU.java:92)
+	at com.ericbarnhill.jmra.MRA2DU.recompose(MRA2DU.java:76)
+	at com.ericbarnhill.jmra.MRA2D.idwt(MRA2D.java:69)
+	at com.ericbarnhill.jmra.TestTest.testUndecWaveletRecon(TestTest.java:89)
+

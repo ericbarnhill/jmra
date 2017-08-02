@@ -18,13 +18,13 @@ import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
 
-public class Real3DWaveletTest {
+public class TestUndec3D {
 
 
     @Test
-    public void testWaveletRecon() {
+    public void testWaveletReconUndec() {
         String filepath = "/home/ericbarnhill/Documents/MATLAB/ericbarnhill/projects/2017-07-06-florian-new-protocol/scratch/fieldmaps/3.nii";
-        String outputpath = "/home/ericbarnhill/Documents/code/jmra/test-images/test.nii";
+        String outputpath = "/home/ericbarnhill/Documents/code/test.nii";
         NiftiVolume nv = null;
         try {
             nv  = NiftiVolume.read(filepath);
@@ -57,18 +57,22 @@ public class Real3DWaveletTest {
         filterBank.add(analysisFilters);
         filterBank.add(synthesisFilters);
 
-        MRA3D mra = new MRA3D(image, filterBank, 3, ConvolverFactory.ConvolutionType.FDCPU);
+        MRA3DU mra = new MRA3DU(image, filterBank, 3, ConvolverFactory.ConvolutionType.FDCPU);
         mra.dwt();
         List<double[][][]> decomp = mra.getDecomposition();
+        System.out.println("Displaying decomp sizes: "); 
         for (int n = 0; n < decomp.size(); n++) {
-            String path = "/home/ericbarnhill/Documents/code/jmra/test-images" + Integer.toString(n)+ "_before.tif";
-            //mra.data2File(decomp.get(n), path);
+            ArrayMath.displaySize(decomp.get(n));
+        }
+        for (int n = 0; n < decomp.size(); n++) {
+            String path = "/home/ericbarnhill/Documents/code/" + Integer.toString(n)+ "_3D_before.tif";
+            mra.data2File(decomp.get(n), path);
         }
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         for (int n = 0; n < decomp.size(); n++) {
-            String path = "/home/ericbarnhill/Documents/code/jmra/test-images" + Integer.toString(n)+ "_after.tif";
-            //mra.data2File(decomp.get(n), path);
+            String path = "/home/ericbarnhill/Documents/code/" + Integer.toString(n)+ "_3D_after.tif";
+            mra.data2File(decomp.get(n), path);
         }
         nv.data = new FourDimensionalArray(ArrayMath.convertTo4d(image));
         nv.header.dim[4] = 1;
