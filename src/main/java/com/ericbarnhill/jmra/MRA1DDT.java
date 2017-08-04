@@ -6,23 +6,20 @@ import com.ericbarnhill.jmra.filters.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MRA1D extends MRA<double[], boolean[], double[]> {
+public class MRA1DDT extends MRA1D {
 
-    FilterPair af;
-    FilterPair sf;
     private int w;
     private int wPad;
     double[] paddedData;
     boolean[] paddedMask;
+    DTFilterBank dtfb;
 
-    public MRA1D() { super(); }
+    public MRA1DDT() { super(); }
 
-    public MRA1D(ConvolverFactory.ConvolutionType convType) { super(convType); }
+    public MRA1DDT(ConvolverFactory.ConvolutionType convType) { super(convType); }
 
-    public MRA1D(double[] origData, boolean[] maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, fb, decompLvls, convType);
-        this.af = fb.af;
-        this.sf = fb.sf;
+    public MRA1DDT(double[] origData, boolean[] maskData, DTFilterBank dtfb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, dtfb.get(0), decompLvls, convType);
         this.w = origData.length;
         this.wPad = (int)nextPwr2(w);
         this.paddedData = ArrayMath.zeroPadBoundaries(origData, wPad);
@@ -30,8 +27,8 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
         this.stride = 2;
     }
 
-    public MRA1D(double[] origData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length), fb, decompLvls, convType);
+    public MRA1DDT(double[] origData, DTFilterBank dtfb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length), dtfb.get(0), decompLvls, convType);
     }
 
     @Override
@@ -52,8 +49,15 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
                 x = waveletData.get(ind);
             }
             // decompose into lo and hi
-            double[] lo = AFB(x, fb.af.lo, decompLvl);
-            double[] hi = AFB(x, fb.af.hi, decompLvl);
+            double[] lo = new double[0];
+            double[] hi = new double[0];
+            if (decompLvl == 0) {
+                lo = AFB(x, faf.lo, decompLvl);
+                hi = AFB(x, faf.hi, decompLvl);
+            } else {
+                lo = AFB(x, af.lo, decompLvl);
+                hi = AFB(x, af.hi, decompLvl);
+            }    
             waveletData.set(ind, lo);
             waveletData.set(ind + localPair, hi);
         }
@@ -70,7 +74,12 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
         for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
             double[] lo = waveletData.get(ind);
             double[] hi = waveletData.get(ind + localPair);
-            double[] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
+            double[] y  = new double[0];
+            if (decompLvl == 0) {
+                y = SFB(lo, hi, fsf.lo, fsf.hi, decompLvl);
+            } else {
+                y = SFB(lo, hi, sf.lo, sf.hi, decompLvl);
+            }
             waveletData.set(ind, y);
         }
         if (dimLvl > 0) {

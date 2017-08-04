@@ -7,7 +7,13 @@ import java.util.Arrays;
 
 class MRA1DU extends MRA1D { 
 
-     public MRA1DU(ConvolverFactory.ConvolutionType convolutionType) { super(convolutionType); }
+     public MRA1DU(ConvolverFactory.ConvolutionType convType) {
+         super(convType);
+     }
+
+     public MRA1DU() {
+         super();
+     }
 
      @Override
      double[] AFB(double[] y, double[] filter, int decompLvl) {

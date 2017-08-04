@@ -1,12 +1,11 @@
-com/ericbarnhill/jmra/App.class
+com/ericbarnhill/jmra/filters/FilterBank.class
 com/ericbarnhill/jmra/Threshold$ThreshMeth.class
-com/ericbarnhill/jmra/Wavelets.class
 com/ericbarnhill/jmra/Threshold.class
 com/ericbarnhill/jmra/MRA2DU.class
 com/ericbarnhill/jmra/Threshold$NoiseEstMeth.class
 com/ericbarnhill/jmra/MRA3DU.class
-com/ericbarnhill/jmra/DualTree.class
 com/ericbarnhill/jmra/Shifter.class
+com/ericbarnhill/jmra/filters/FilterPair.class
 com/ericbarnhill/jmra/MRA1DU.class
 com/ericbarnhill/jmra/MRA2D.class
 com/ericbarnhill/jmra/MRA1D.class

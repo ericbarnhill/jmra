@@ -2,6 +2,7 @@ package com.ericbarnhill.jmra;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.ericbarnhill.jvcl.*;
+import com.ericbarnhill.jmra.filters.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import ij.io.Opener;
@@ -24,25 +25,31 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     boolean[][] paddedMask;
     boolean undecimated;
 
-    public MRA2D(double[][] originalData, boolean[][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
-        super(originalData, maskData, filterBank, decompLvls, convolutionType);
-        this.w = originalData.length;
-        this.h = originalData[0].length;
+    public MRA2D() {
+        super();
+    }
+
+    public MRA2D(double[][] origData, boolean[][] maskData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, filterBank, decompLvls, convType);
+        this.af = filterBank.af;
+        this.sf = filterBank.sf;
+        this.w = origData.length;
+        this.h = origData[0].length;
         this.area = w*h;
         this.wPad = (int)nextPwr2(w);
         this.hPad = (int)nextPwr2(h);
         this.areaPad = wPad * hPad;
-        this.paddedData = ArrayMath.zeroPadBoundaries(originalData, (wPad-w)/2, (hPad-h)/2);
+        this.paddedData = ArrayMath.zeroPadBoundaries(origData, (wPad-w)/2, (hPad-h)/2);
         this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2);
         this.stride = 4;
         this.dimLvls = 2;
         this.waveletData = new ArrayList<double[][]>(20);
-        mra1d = new MRA1D(convolutionType);
+        mra1d = new MRA1D(convType);
         initializeWaveletData();
     }
 
-    public MRA2D(double[][] originalData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
-        this(originalData, ArrayMath.fillWithTrue(originalData.length,originalData[0].length), filterBank, decompLvls, convolutionType);
+    public MRA2D(double[][] origData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), filterBank, decompLvls, convType);
     }
 
     void initializeWaveletData() {
@@ -74,8 +81,8 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
                     x = ArrayMath.shiftDim(x);
                     break;
             }
-            double[][] lo = AFB(x, afl, decompLvl);
-            double[][] hi = AFB(x, afh, decompLvl);
+            double[][] lo = AFB(x, fb.af.lo, decompLvl);
+            double[][] hi = AFB(x, fb.af.hi, decompLvl);
             switch(localStride) {
                 case 2:
                     lo = ArrayMath.shiftDim(lo);
@@ -104,7 +111,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
                     hi = ArrayMath.shiftDim(hi);
                     break;
             }
-            double[][] y = SFB(lo, hi, sfl, sfh, decompLvl);
+            double[][] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
             switch (localStride) {
                 case 2:
                     y = ArrayMath.shiftDim(y);
@@ -117,9 +124,6 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         }
         if (decompLvl > 0) {
             waveletData.set(stride*(decompLvl-1), waveletData.get(stride*decompLvl));
-        }
-        if (decompLvl == 0 && dimLvl == 0) {
-            filteredData = ArrayMath.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2);
         }
     }
 
@@ -145,25 +149,10 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         return y;
     }
 
-    public void threshold(Threshold.ThreshMeth threshMeth, Threshold.NoiseEstMeth noiseEstMeth) {
-        // loop through each subband, pass method
-        for (int i = 0; i < waveletData.size(); i++) {
-            // avoid scaling datas
-            if (i % stride != 0) {
-                int level = (int)Math.floor(i / stride);
-                int decimFac = (int)Math.pow(2, level+1);
-                boolean[][] maskDownsampled = ArrayMath.decimate(paddedMask, decimFac);
-                double[] waveletVec = ArrayMath.vectorize(waveletData.get(i));
-                boolean[] maskVec = ArrayMath.vectorize(maskDownsampled);
-                waveletData.set(i, 
-                    ArrayMath.devectorize(
-                        Threshold.threshold(
-                            waveletVec, maskVec, threshMeth, noiseEstMeth)
-                        ,w/decimFac)
-                    );
-            }
-        }
+    public void accept(Threshold threshold) {
+        threshold.visit(this);
     }
+
     // for debugging and testing
     public void data2File(double[][] data, String path) {
         int w = data.length;

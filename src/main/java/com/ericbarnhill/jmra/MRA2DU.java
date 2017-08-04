@@ -9,18 +9,23 @@ import ij.io.FileSaver;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
+import com.ericbarnhill.jmra.filters.*;
 
 class MRA2DU extends MRA2D {
 
     MRA1DU mra1du;
 
-    public MRA2DU(double[][] originalData, boolean[][] maskData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
-        super(originalData, maskData, filterBank, decompLvls, convolutionType);
-        mra1du = new MRA1DU(convolutionType);
+    public MRA2DU() {
+        super();
     }
 
-    public MRA2DU(double[][] originalData, ArrayList<ArrayList<double[]>> filterBank, int decompLvls, ConvolverFactory.ConvolutionType convolutionType) {
-        this(originalData, ArrayMath.fillWithTrue(originalData.length,originalData[0].length), filterBank, decompLvls, convolutionType);
+    public MRA2DU(double[][] origData, boolean[][] maskData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, filterBank, decompLvls, convType);
+        mra1du = new MRA1DU(convType);
+    }
+
+    public MRA2DU(double[][] origData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), filterBank, decompLvls, convType);
     }
 
     @Override
@@ -49,23 +54,8 @@ class MRA2DU extends MRA2D {
         return y;
     }
 
-    @Override
-    public void threshold(Threshold.ThreshMeth threshMeth, Threshold.NoiseEstMeth noiseEstMeth) {
-        // loop through each subband, pass method
-        for (int i = 0; i < waveletData.size(); i++) {
-            // avoid scaling datas
-            if (i % stride != 0) {
-                int level = (int)Math.floor(i / stride);
-                double[] waveletVec = ArrayMath.vectorize(waveletData.get(i));
-                boolean[] maskVec = ArrayMath.vectorize(maskData);
-                waveletData.set(i, 
-                    ArrayMath.devectorize(
-                        Threshold.threshold(
-                            waveletVec, maskVec, threshMeth, noiseEstMeth)
-                        ,w)
-                    );
-            }
-        }
+    public void accept(Threshold threshold) {
+        threshold.visit(this);
     }
 
     // for debugging and testing
