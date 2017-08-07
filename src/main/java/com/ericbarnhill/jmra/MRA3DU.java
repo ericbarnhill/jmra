@@ -12,7 +12,7 @@ import ij.ImageStack;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 
-class MRA3DU extends MRA3D {
+public class MRA3DU extends MRA3D {
 
      MRA1DU mra1du;
 
@@ -30,7 +30,7 @@ class MRA3DU extends MRA3D {
     }
 
     @Override
-    double[][][] AFB(double[][][] data, double[] filter, int decompositionLevel) {
+    public double[][][] AFB(double[][][] data, double[] filter, int decompositionLevel) {
         final int fi = data.length;
         final int fj = data[0].length;
         final int fk = data[0][0].length;
@@ -44,7 +44,7 @@ class MRA3DU extends MRA3D {
     }
     
     @Override
-    double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
+    public double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
         final int fi = lo.length;
         final int fj = lo[0].length;
         double[][][] y = new double[fi][fj][];

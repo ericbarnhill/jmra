@@ -5,7 +5,7 @@ import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.filters.*;
 
-public class DualTree<N, B, V> {
+abstract class DualTree<N, B, V> {
 
     public ArrayList<MRA<N, B, V>> trees;
     public ArrayList<DTFilterBank> banks;
@@ -31,8 +31,8 @@ public class DualTree<N, B, V> {
 
     public abstract void idwt();
 
-    public abstract void addSubtract();
+    public abstract void addSubtract(boolean fwd);
 
-    public N getFilteredData();
+    public abstract N getFilteredData();
 
 }

@@ -1,8 +1,10 @@
 package com.ericbarnhill.jmra.dualTree;
 
 import java.util.ArrayList; 
+import com.ericbarnhill.arrayMath.*;
 import com.ericbarnhill.jvcl.*; 
 import com.ericbarnhill.jmra.*;
+import com.ericbarnhill.jmra.filters.*;
 
 public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double[]> {
 
@@ -22,10 +24,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
             ArrayList<FilterPair> af = new ArrayList<FilterPair>();
             ArrayList<FilterPair> sf = new ArrayList<FilterPair>();
             for (int j = 0; j < 3; j++) {
-                faf.add(fb.faf(indices[j]));
-                fsf.add(fb.fsf(indices[j]));
-                af.add(fb.af(indices[j]));
-                sf.add(fb.sf(indices[j]));
+                faf.add(fb.faf.get(indices[j]));
+                fsf.add(fb.fsf.get(indices[j]));
+                af.add(fb.af.get(indices[j]));
+                sf.add(fb.sf.get(indices[j]));
             }
             banks.add(new DTFilterBank(faf, fsf, af, sf));
         }
@@ -34,10 +36,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         }
     }
 
-    public double[][] getFilteredData() {
-        double[][] bankSum = ArrayMath.fillWithZeros(origData.length, origData[0].length);
-        for (MRA3DDT tree : trees) {
-            bankSum = ArrayMath.add(bankSum, tree.getFilteredData);
+    public double[][][] getFilteredData() {
+        double[][][] bankSum = new double[origData.length][origData[0].length][origData[0][0].length];
+        for (MRA<double[][][], boolean[][][], double[]> tree : trees) {
+            bankSum = ArrayMath.add(bankSum, tree.getFilteredData());
         }
         bankSum = ArrayMath.divide(bankSum, Math.sqrt(8));
         return bankSum;
@@ -47,13 +49,21 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();
         }
-        addSubtract();
+        addSubtract(true);
     }
 
     public void idwt() {
-        addSubtract();
+        addSubtract(false);
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).idwt();
+        }
+    }
+
+    public void addSubtract(boolean fwd) {
+        if (fwd) {
+            addSubtractFwd();
+        } else {
+            addSubtractInv();
         }
     }
 
@@ -61,27 +71,27 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
 
-                ArrayList<ArrayList<double[][]>> pm1 = pm4(
+                ArrayList<double[][][]> pm1 = pm4(
                         trees.get(0).waveletData.get(i), 
                         trees.get(5).waveletData.get(i),
                         trees.get(3).waveletData.get(i),
                         trees.get(6).waveletData.get(i));
 
-                trees.get(0).waveletData.set(pm1.get(0));
-                trees.get(5).waveletData.set(pm1.get(5));
-                trees.get(3).waveletData.set(pm1.get(3));
-                trees.get(6).waveletData.set(pm1.get(6));
+                trees.get(0).waveletData.set(i, pm1.get(0));
+                trees.get(5).waveletData.set(i, pm1.get(5));
+                trees.get(3).waveletData.set(i, pm1.get(3));
+                trees.get(6).waveletData.set(i, pm1.get(6));
 
-                ArrayList<ArrayList<double[][]>> pm2 = pm4(
+                ArrayList<double[][][]> pm2 = pm4(
                         trees.get(8).waveletData.get(i), 
                         trees.get(2).waveletData.get(i),
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(pm1.get(8));
-                trees.get(2).waveletData.set(pm1.get(2));
-                trees.get(4).waveletData.set(pm1.get(4));
-                trees.get(1).waveletData.set(pm1.get(1));
+                trees.get(8).waveletData.set(i, pm1.get(8));
+                trees.get(2).waveletData.set(i, pm1.get(2));
+                trees.get(4).waveletData.set(i, pm1.get(4));
+                trees.get(1).waveletData.set(i, pm1.get(1));
 
             }
         }
@@ -91,95 +101,79 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
 
-                ArrayList<ArrayList<double[][]>> pm1 = pm4inv(
+                ArrayList<double[][][]> pm1 = pm4inv(
                         trees.get(0).waveletData.get(i), 
                         trees.get(5).waveletData.get(i),
                         trees.get(3).waveletData.get(i),
                         trees.get(6).waveletData.get(i));
 
-                trees.get(0).waveletData.set(pm1.get(0));
-                trees.get(5).waveletData.set(pm1.get(5));
-                trees.get(3).waveletData.set(pm1.get(3));
-                trees.get(6).waveletData.set(pm1.get(6));
+                trees.get(0).waveletData.set(i, pm1.get(0));
+                trees.get(5).waveletData.set(i, pm1.get(5));
+                trees.get(3).waveletData.set(i, pm1.get(3));
+                trees.get(6).waveletData.set(i, pm1.get(6));
 
-                ArrayList<ArrayList<double[][]>> pm2 = pm4inv(
+                ArrayList<double[][][]> pm2 = pm4inv(
                         trees.get(8).waveletData.get(i), 
                         trees.get(2).waveletData.get(i),
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(pm1.get(8));
-                trees.get(2).waveletData.set(pm1.get(2));
-                trees.get(4).waveletData.set(pm1.get(4));
-                trees.get(1).waveletData.set(pm1.get(1));
+                trees.get(8).waveletData.set(i, pm1.get(8));
+                trees.get(2).waveletData.set(i, pm1.get(2));
+                trees.get(4).waveletData.set(i, pm1.get(4));
+                trees.get(1).waveletData.set(i, pm1.get(1));
 
             }
         }
     }
 
-	private static ArrayList<ArrayList<double[][][]>> pm4 (ArrayList<double[][][]> a, ArrayList<double[][][]> b,
-			ArrayList<double[][][]> c, ArrayList<double[][][]> d) {
-		ArrayList<double[][][]> p = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> q = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> r = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> s = new ArrayList<double[][][]>();
-		// no operation on lo pass
-		p.add(JVCLUtils.deepCopy(a.get(0)));
-		q.add(JVCLUtils.deepCopy(b.get(0)));
-		r.add(JVCLUtils.deepCopy(c.get(0)));
-		s.add(JVCLUtils.deepCopy(d.get(0)));
-		// pm on high pass
-		for (int i = 1; i < a.size(); i++) {
-			p.add(
+	private static ArrayList<double[][][]> pm4 (double[][][] a, double[][][] b,
+			double[][][] c, double[][][] d) {
+		 double[][][] p = 	
 				ArrayMath.divide(
 					ArrayMath.subtract(
 						ArrayMath.subtract(
 							ArrayMath.subtract(
-								JVCLUtils.deepCopy(a.get(i)),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.deepCopy(a),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			q.add(
+         double[][][] q = 
 				ArrayMath.divide(
 					ArrayMath.add(
 						ArrayMath.add(
 							ArrayMath.subtract(
-								JVCLUtils.deepCopy(a.get(i)),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.deepCopy(a),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			r.add(
+         double[][][] r = 
 				ArrayMath.divide(
 					ArrayMath.add(
 						ArrayMath.subtract(
 							ArrayMath.add(
-								JVCLUtils.deepCopy(a.get(i)),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.deepCopy(a),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			s.add(
+         double[][][] s = 
 				ArrayMath.divide(
 					ArrayMath.subtract(
 						ArrayMath.add(
 							ArrayMath.add(
-								JVCLUtils.deepCopy(a.get(i)),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.deepCopy(a),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-		}
-		ArrayList<ArrayList<double[][][]>> pm = new ArrayList<ArrayList<double[][][]>>();
+		ArrayList<double[][][]> pm = new ArrayList<double[][][]>();
 		pm.add(p);
 		pm.add(q);
 		pm.add(r);
@@ -187,69 +181,53 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
 		return pm;
 	}
 
-	private static ArrayList<ArrayList<double[][][]>> pm4inv (ArrayList<double[][][]> a, ArrayList<double[][][]> b,
-			ArrayList<double[][][]> c, ArrayList<double[][][]> d) {
-		ArrayList<double[][][]> p = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> q = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> r = new ArrayList<double[][][]>();
-		ArrayList<double[][][]> s = new ArrayList<double[][][]>();
-		// no operation on lo pass
-		p.add(JVCLUtils.deepCopy(a.get(0)));
-		q.add(JVCLUtils.deepCopy(b.get(0)));
-		r.add(JVCLUtils.deepCopy(c.get(0)));
-		s.add(JVCLUtils.deepCopy(d.get(0)));
-		// pm on high pass
-		for (int i = 1; i < a.size(); i++) {
-			p.add(
+	private static ArrayList<double[][][]> pm4inv (double[][][] a, double[][][] b,
+			double[][][] c, double[][][] d) {
+        double[][][] p = 
 				ArrayMath.divide(
 					ArrayMath.add(
 						ArrayMath.add(
 							ArrayMath.add(
-								JVCLUtils.deepCopy(a.get(i)),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.deepCopy(a),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			q.add(
+        double[][][] q = 
 				ArrayMath.divide(
 					ArrayMath.add(
 						ArrayMath.add(
 							ArrayMath.subtract(
-								ArrayMath.multiply(JVCLUtils.deepCopy(a.get(i)), -1),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.multiply(ArrayMath.deepCopy(a), -1),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			r.add(
+        double[][][] r = 
 				ArrayMath.divide(
 					ArrayMath.add(
 						ArrayMath.subtract(
 							ArrayMath.add(
-								ArrayMath.multiply(JVCLUtils.deepCopy(a.get(i)), -1),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.multiply(ArrayMath.deepCopy(a), -1),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-			s.add(
+        double[][][] s = 
 				ArrayMath.divide(
 					ArrayMath.subtract(
 						ArrayMath.add(
 							ArrayMath.add(
-								ArrayMath.multiply(JVCLUtils.deepCopy(a.get(i)), -1),
-								JVCLUtils.deepCopy(b.get(i))
-							), JVCLUtils.deepCopy(c.get(i))
-						), JVCLUtils.deepCopy(d.get(i))
+								ArrayMath.multiply(ArrayMath.deepCopy(a), -1),
+								ArrayMath.deepCopy(b)
+							), ArrayMath.deepCopy(c)
+						), ArrayMath.deepCopy(d)
 					), 2
-				)
 			);
-		}
-		ArrayList<ArrayList<double[][][]>> pm = new ArrayList<ArrayList<double[][][]>>();
+		ArrayList<double[][][]> pm = new ArrayList<double[][][]>();
 		pm.add(p);
 		pm.add(q);
 		pm.add(r);

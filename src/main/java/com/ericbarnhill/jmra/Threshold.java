@@ -128,6 +128,7 @@ public class Threshold {
         }
     }
 
+    /*
     public void visit(DualTree1D dt1d) {
         for (int i = 0; i < dt1d.tree1R.waveletData.size(); i++) {
             if (i % dt1d.tree1R.stride != 0) {
@@ -143,7 +144,7 @@ public class Threshold {
             }
         }
     }
-                
+     */           
 
     public  double[] threshold(double[] data, boolean[] mask) {
         double sigma = estimateSigma(data, mask);

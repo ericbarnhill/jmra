@@ -1,7 +1,8 @@
-package com.ericbarnhill.jmra;
+package com.ericbarnhill.jmra.dualTree;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.ericbarnhill.jvcl.*;
+import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.filters.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,21 +25,19 @@ class MRA2DDT extends MRA2D {
     double[][] paddedData;
     boolean[][] paddedMask;
     boolean undecimated;
-    FilterPair faf;
-    FilterPair fsf;
+    DTFilterBank fb;
 
-    public MRA2DDT(double[][] origData, boolean[][] maskData, DTFilterSet dtfs, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, new FilterBank(dtfs.f1, dtfs.f2), decompLvls, convType);
-        faf = dtfs.ff1;
-        fsf = dtfs.ff2;
+    public MRA2DDT(double[][] origData, boolean[][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, decompLvls, convType);
+        this.fb = fb;
     }
 
-    public MRA2DDT(double[][] origData, DTFilterSet dtfs, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), dtfs, decompLvls, convType);
+    public MRA2DDT(double[][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), fb, decompLvls, convType);
     }
 
     @Override
-    void decompose(int decompLvl, int dimLvl) {
+    public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl); // 4 for dimLvl 0, 2 for dimLvl 1
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl; // starting point
@@ -58,26 +57,26 @@ class MRA2DDT extends MRA2D {
             double[][] lo = new double[0][];
             double[][] hi = new double[0][];
             switch(localStride) { // shift dim for y processing. done as a switch block so higher dim code can all use the identical form
+                case 4:
+                    if (decompLvl == 0) {
+                        lo = AFB(x, fb.faf.get(0).lo, decompLvl);
+                        hi = AFB(x, fb.faf.get(0).hi, decompLvl);
+                    } else {
+                        lo = AFB(x, fb.af.get(0).lo, decompLvl);
+                        hi = AFB(x, fb.af.get(0).hi, decompLvl);
+                    }    
+                    break;
                 case 2:
                     x = ArrayMath.shiftDim(x);
                     if (decompLvl == 0) {
-                        lo = AFB(x, faf2.lo, decompLvl);
-                        hi = AFB(x, faf2.hi, decompLvl);
+                        lo = AFB(x, fb.faf.get(1).lo, decompLvl);
+                        hi = AFB(x, fb.faf.get(1).hi, decompLvl);
                     } else {
-                        lo = AFB(x, af2.lo, decompLvl);
-                        hi = AFB(x, af2.hi, decompLvl);
+                        lo = AFB(x, fb.af.get(1).lo, decompLvl);
+                        hi = AFB(x, fb.af.get(1).hi, decompLvl);
                     }    
                     lo = ArrayMath.shiftDim(lo);
                     hi = ArrayMath.shiftDim(hi);
-                    break;
-                case 4:
-                    if (decompLvl == 0) {
-                        lo = AFB(x, faf1.lo, decompLvl);
-                        hi = AFB(x, faf1.hi, decompLvl);
-                    } else {
-                        lo = AFB(x, af1.lo, decompLvl);
-                        hi = AFB(x, af1.hi, decompLvl);
-                    }    
                     break;
             }
             waveletData.set(ind, lo);
@@ -89,7 +88,7 @@ class MRA2DDT extends MRA2D {
     }
 
     @Override
-    void recompose(int decompLvl, int dimLvl) {
+    public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl;
@@ -98,22 +97,22 @@ class MRA2DDT extends MRA2D {
             double[][] hi = waveletData.get(ind + localPair);
             double[][] y = new double[0][]; 
             switch (localStride) {
+                case 4:
+                    if (decompLvl == 0) {
+                        y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
+                    } else {
+                        y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
+                    }
+                    break;
                 case 2:
                     lo = ArrayMath.shiftDim(lo);
                     hi = ArrayMath.shiftDim(hi);
                     if (decompLvl == 0) {
-                        y = SFB(lo, hi, fsf2.lo, fsf2.hi, decompLvl);
+                        y = SFB(lo, hi, fb.fsf.get(1).lo, fb.fsf.get(1).hi, decompLvl);
                     } else {
-                        y = SFB(lo, hi, sf2.lo, sf2.hi, decompLvl);
+                        y = SFB(lo, hi, fb.sf.get(1).lo, fb.sf.get(1).hi, decompLvl);
                     }
                     y = ArrayMath.shiftDim(y);
-                    break;
-                case 4:
-                    if (decompLvl == 0) {
-                        y = SFB(lo, hi, fsf1.lo, fsf1.hi, decompLvl);
-                    } else {
-                        y = SFB(lo, hi, sf1.lo, sf1.hi, decompLvl);
-                    }
                     break;
             }
             waveletData.set(ind, y);

@@ -11,7 +11,7 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 
-class MRA2D extends MRA<double[][], boolean[][], double[]> {
+public class MRA2D extends MRA<double[][], boolean[][], double[]> {
 
     int w;
     int h;
@@ -29,10 +29,8 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         super();
     }
 
-    public MRA2D(double[][] origData, boolean[][] maskData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, filterBank, decompLvls, convType);
-        this.af = filterBank.af;
-        this.sf = filterBank.sf;
+    public MRA2D(double[][] origData, boolean[][] maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, fb, decompLvls, convType);
         this.w = origData.length;
         this.h = origData[0].length;
         this.area = w*h;
@@ -48,8 +46,25 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
         initializeWaveletData();
     }
 
-    public MRA2D(double[][] origData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), filterBank, decompLvls, convType);
+    public MRA2D(double[][] origData, boolean[][] maskData, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, decompLvls, convType);
+        this.w = origData.length;
+        this.h = origData[0].length;
+        this.area = w*h;
+        this.wPad = (int)nextPwr2(w);
+        this.hPad = (int)nextPwr2(h);
+        this.areaPad = wPad * hPad;
+        this.paddedData = ArrayMath.zeroPadBoundaries(origData, (wPad-w)/2, (hPad-h)/2);
+        this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2);
+        this.stride = 4;
+        this.dimLvls = 2;
+        this.waveletData = new ArrayList<double[][]>(20);
+        mra1d = new MRA1D(convType);
+        initializeWaveletData();
+    }
+
+    public MRA2D(double[][] origData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length), fb, decompLvls, convType);
     }
 
     void initializeWaveletData() {
@@ -59,7 +74,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     @Override
-    void decompose(int decompLvl, int dimLvl) {
+    public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl); // 4 for dimLvl 0, 2 for dimLvl 1
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl; // starting point
@@ -98,7 +113,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     @Override
-    void recompose(int decompLvl, int dimLvl) {
+    public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl;
@@ -128,7 +143,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     @Override
-  double[][] AFB(double[][] data, double[] filter, int decompLvl) { 
+    public double[][] AFB(double[][] data, double[] filter, int decompLvl) { 
       final int fi = data.length;
       final int fj = data[0].length;
       double[][] filtData = new double[fi][];
@@ -140,7 +155,7 @@ class MRA2D extends MRA<double[][], boolean[][], double[]> {
 
 
     @Override
-    double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompLvl) {
+    public double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int fi = lo.length;
         double[][] y = new double[fi][];
         for (int i = 0; i < fi; i++) {

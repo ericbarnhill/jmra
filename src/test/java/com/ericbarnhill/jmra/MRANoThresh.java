@@ -13,14 +13,15 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.ericbarnhill.jvcl.*;
+import com.ericbarnhill.jmra.filters.*;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
 
-public class Real2DWaveletTest {
+public class MRANoThresh{
 
 
-    public static double[][] image2Array(String path) {
+    static double[][] image2Array(String path) {
         try {
             ImagePlus ip = new Opener().openImage(path);
             ImageProcessor ipr = ip.getProcessor();
@@ -38,7 +39,7 @@ public class Real2DWaveletTest {
         }
     }
 
-    public static void array2Image(double[][] array, String path) {
+    static void array2Image(double[][] array, String path) {
         int w = array.length;
         int h = array[0].length;
         FloatProcessor fp = new FloatProcessor(w,h);
@@ -53,29 +54,15 @@ public class Real2DWaveletTest {
     }
 
     @Test
-    public void testWaveletRecon() {
+    public void MRA2DTest() {
+        // PREP IMAGE
         String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
-        String file = root + "lena.tif";
-        String file2 = root + "lenafilt.tif"; 
-        double[][] array = image2Array(file);
-        double[] h0 = Wavelets.afLoNoTree;
-        double[] h1 = Wavelets.afHiNoTree;
-        double[] g0 = Wavelets.sfLoNoTree;
-        double[] g1 = Wavelets.sfHiNoTree;
-        ArrayList<double[]> analysisFilters = new ArrayList<double[]>();
-        analysisFilters.add(h0);
-        analysisFilters.add(h1);
-        ArrayList<double[]> synthesisFilters = new ArrayList<double[]>();
-        synthesisFilters.add(g0);
-        synthesisFilters.add(g1);
-        ArrayList<ArrayList<double[]>> filterBank = new ArrayList<ArrayList<double[]>>();
-        filterBank.add(analysisFilters);
-        filterBank.add(synthesisFilters);
-
-        double[][] image = image2Array(file);
-        double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
-        //image = ArrayMath.add(ArrayMath.multiply(noise, 10), image);
-        MRA2D mra = new MRA2D(image, filterBank, 3, ConvolverFactory.ConvolutionType.FDCPU);
+        String testFile = root + "lena.tif";
+        double[][] image = image2Array(testFile);
+        // PREP MRA
+        FilterBank fb = Wavelets.getFarras();
+        //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
+        MRA2D mra = new MRA2D(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU);
         mra.dwt();
         List<double[][]> decomp = mra.getDecomposition();
         System.out.println("Displaying decomp sizes: "); 
@@ -84,8 +71,7 @@ public class Real2DWaveletTest {
             String path = root + Integer.toString(n)+ "_before.tif";
             array2Image(decomp.get(n), path);
         }
-       
-        mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
+        //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
 
         mra.idwt();
         /*
@@ -95,7 +81,8 @@ public class Real2DWaveletTest {
         }
         */
         image = mra.getFilteredData();
-        array2Image(image, file2);
+        String resultFile = root + "lena_idwt.tif";
+        array2Image(image, resultFile);
     }
 }
 

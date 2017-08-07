@@ -19,76 +19,10 @@
 [INFO] --- maven-compiler-plugin:3.2:compile (default-compile) @ jmra ---
 [INFO] Changes detected - recompiling the module!
 [INFO] Compiling 24 source files to /home/ericbarnhill/Documents/code/jmra/target/classes
-[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
-[INFO] -------------------------------------------------------------
-[ERROR] COMPILATION ERROR : 
-[INFO] -------------------------------------------------------------
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree.java:[89,18] no suitable method found for visit(com.ericbarnhill.jmra.dualTree.DualTree<N,B,V>)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA1D) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA1D)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA1DU) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA1DU)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA2D) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA2D)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA2DU) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA2DU)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA3D) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA3D)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA3DU) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA3DU)
-    method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.dualTree.DualTree1D) is not applicable
-      (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.dualTree.DualTree1D)
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[12,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[13,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[14,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[15,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDT.java:[23,39] cannot find symbol
-  symbol:   method get(int)
-  location: variable dtfs of type com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDT.java:[32,69] cannot find symbol
-  symbol:   method get(int)
-  location: variable dtfs of type com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDTU.java:[18,35] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[INFO] 8 errors 
-[INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1.120 s
-[INFO] Finished at: 2017-08-04T14:31:37+02:00
-[INFO] Final Memory: 18M/478M
+[INFO] Total time: 1.740 s
+[INFO] Finished at: 2017-08-07T10:21:07+02:00
+[INFO] Final Memory: 18M/474M
 [INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.2:compile (default-compile) on project jmra: Compilation failure: Compilation failure:
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree.java:[89,18] no suitable method found for visit(com.ericbarnhill.jmra.dualTree.DualTree<N,B,V>)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA1D) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA1D)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA1DU) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA1DU)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA2D) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA2D)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA2DU) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA2DU)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA3D) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA3D)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.MRA3DU) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.MRA3DU)
-[ERROR] method com.ericbarnhill.jmra.Threshold.visit(com.ericbarnhill.jmra.dualTree.DualTree1D) is not applicable
-[ERROR] (argument mismatch; com.ericbarnhill.jmra.dualTree.DualTree<N,B,V> cannot be converted to com.ericbarnhill.jmra.dualTree.DualTree1D)
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[12,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[13,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[14,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/DualTree1D.java:[15,50] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDT.java:[23,39] cannot find symbol
-[ERROR] symbol:   method get(int)
-[ERROR] location: variable dtfs of type com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDT.java:[32,69] cannot find symbol
-[ERROR] symbol:   method get(int)
-[ERROR] location: variable dtfs of type com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA1DDTU.java:[18,35] incompatible types: java.util.ArrayList<java.util.ArrayList<java.util.ArrayList<double[]>>> cannot be converted to com.ericbarnhill.jmra.filters.DTFilterSet
-[ERROR] -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

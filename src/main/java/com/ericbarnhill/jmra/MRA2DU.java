@@ -11,7 +11,7 @@ import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 import com.ericbarnhill.jmra.filters.*;
 
-class MRA2DU extends MRA2D {
+public class MRA2DU extends MRA2D {
 
     MRA1DU mra1du;
 
@@ -29,7 +29,7 @@ class MRA2DU extends MRA2D {
     }
 
     @Override
-    double[][] AFB(double[][] data, double[] filter, int decompositionLevel) {
+    public double[][] AFB(double[][] data, double[] filter, int decompositionLevel) {
         final int J = decompLvls - decompositionLevel;
         final int fi = data.length;
         final int fj = data[0].length;
@@ -42,7 +42,7 @@ class MRA2DU extends MRA2D {
     }
 
     @Override
-    double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
+    public double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
         final int J = decompLvls - decompositionLevel;
         final int N = sfl.length + sfh.length;
         final int fi = lo.length;

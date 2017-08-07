@@ -30,12 +30,23 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
         this.stride = 2;
     }
 
+    public MRA1D(double[] origData, boolean[] maskData, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, decompLvls, convType);
+        this.af = fb.af;
+        this.sf = fb.sf;
+        this.w = origData.length;
+        this.wPad = (int)nextPwr2(w);
+        this.paddedData = ArrayMath.zeroPadBoundaries(origData, wPad);
+        this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, wPad);
+        this.stride = 2;
+    }
+
     public MRA1D(double[] origData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this(origData, ArrayMath.fillWithTrue(origData.length), fb, decompLvls, convType);
     }
 
     @Override
-    void decompose(int decompLvl, int dimLvl) {
+    public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, 2 - dimLvl); // 4 for dimLvl 0, 2 for dimLvl 1
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl; // starting point
@@ -63,7 +74,7 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
     }
 
     @Override
-    void recompose(int decompLvl, int dimLvl) {
+    public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, 2 - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl;
@@ -82,12 +93,12 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
     }
 
     @Override
-     void accept(Threshold threshold) {
+     public void accept(Threshold threshold) {
          threshold.visit(this);
     }
 
     @Override
-     double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] AFB(double[] y, double[] filter, int decompLvl) {
         final int N = y.length/2;
         final int L = filter.length;
         y = Shifter.circShift(y, -L/2);
@@ -100,7 +111,7 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
     }
 
     @Override
-     double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int N = 2*lo.length;
         final int L0 = sfl.length;
         lo = upFirDn.upFirDn(lo, sfl, 2, 1);

@@ -16,12 +16,12 @@ public abstract class MRA<N, B, V> {
      N origData;
      B maskData;
      public ArrayList<N> waveletData; // sometimes manipulated and put back
-     int decompLvls; // also used for stride
-     int dimLvls;
-     int stride;
-     FilterBank fb;
-     ConvolverFactory.ConvolutionType convType;
-     UpFirDn upFirDn;
+     public int decompLvls; // also used for stride
+     public int dimLvls;
+     public int stride;
+     public FilterBank fb;
+     public ConvolverFactory.ConvolutionType convType;
+     public UpFirDn upFirDn;
 
      public MRA() {
      }
@@ -30,6 +30,17 @@ public abstract class MRA<N, B, V> {
         this.convType =  convType;
         upFirDn = new UpFirDn(convType); 
      }
+
+     // for extensions that require a filter bank with different specifications
+    public MRA(N origData, B maskData, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this.origData = origData;
+        this.maskData = maskData;
+        this.fb = fb;
+        this.decompLvls = decompLvls;
+        waveletData = new ArrayList<N>();
+        this.convType =  convType;
+        upFirDn = new UpFirDn(convType); 
+    } 
 
     public MRA(N origData, B maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this.origData = origData;
@@ -41,27 +52,27 @@ public abstract class MRA<N, B, V> {
         upFirDn = new UpFirDn(convType); 
     } 
 
-    final void dwt() {
+    final public void dwt() {
         for (int decompLvl = 0; decompLvl < decompLvls; decompLvl++) {
             decompose(decompLvl, 0);
         }
     }
 
-    final void idwt() {
+    final public void idwt() {
         for (int decompLvl = decompLvls-1; decompLvl >= 0; decompLvl--) {
             recompose(decompLvl, dimLvls-1);
         }
     }
 
-    abstract void decompose(int decompLvl, int dimLvl);
+    abstract public void decompose(int decompLvl, int dimLvl);
 
-    abstract void recompose(int decompLvl, int dimLvl);
+    abstract public void recompose(int decompLvl, int dimLvl);
 
-    abstract N AFB(N y, V filter, int decompLvl);
+    abstract public N AFB(N y, V filter, int decompLvl);
 
-    abstract N SFB(N lo, N hi, V sfl, V sfh, int decompLvl); 
+    abstract public N SFB(N lo, N hi, V sfl, V sfh, int decompLvl); 
 
-    abstract void accept(Threshold threshold);
+    abstract public void accept(Threshold threshold);
 
     public N getOriginalData() {
         return origData;
@@ -71,7 +82,11 @@ public abstract class MRA<N, B, V> {
         return waveletData.get(0);
     }
 
-    long nextPwr2(int n) {
+    public ArrayList<N> getDecomposition() {
+        return waveletData;
+    }
+
+    public long nextPwr2(int n) {
         double logn = Math.log(n) / Math.log(2);
         return (long)Math.pow(2,(int)Math.ceil(logn));
     }

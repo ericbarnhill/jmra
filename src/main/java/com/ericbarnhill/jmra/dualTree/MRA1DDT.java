@@ -1,7 +1,8 @@
-package com.ericbarnhill.jmra;
+package com.ericbarnhill.jmra.dualTree;
 
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.ericbarnhill.jvcl.*;
+import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.filters.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,27 +13,28 @@ public class MRA1DDT extends MRA1D {
     private int wPad;
     double[] paddedData;
     boolean[] paddedMask;
-    DTFilterBank dtfb;
+    DTFilterBank fb;
 
     public MRA1DDT() { super(); }
 
     public MRA1DDT(ConvolverFactory.ConvolutionType convType) { super(convType); }
 
-    public MRA1DDT(double[] origData, boolean[] maskData, DTFilterBank dtfb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, dtfb.get(0), decompLvls, convType);
+    public MRA1DDT(double[] origData, boolean[] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, decompLvls, convType);
         this.w = origData.length;
         this.wPad = (int)nextPwr2(w);
         this.paddedData = ArrayMath.zeroPadBoundaries(origData, wPad);
         this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, wPad);
         this.stride = 2;
+        this.fb = fb;
     }
 
-    public MRA1DDT(double[] origData, DTFilterBank dtfb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length), dtfb.get(0), decompLvls, convType);
+    public MRA1DDT(double[] origData, int decompLvls, DTFilterBank fb, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length), fb, decompLvls, convType);
     }
 
     @Override
-    void decompose(int decompLvl, int dimLvl) {
+    public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, 2 - dimLvl); // 4 for dimLvl 0, 2 for dimLvl 1
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl; // starting point
@@ -52,11 +54,11 @@ public class MRA1DDT extends MRA1D {
             double[] lo = new double[0];
             double[] hi = new double[0];
             if (decompLvl == 0) {
-                lo = AFB(x, faf.lo, decompLvl);
-                hi = AFB(x, faf.hi, decompLvl);
+                lo = AFB(x, fb.faf.get(0).lo, decompLvl);
+                hi = AFB(x, fb.faf.get(0).hi, decompLvl);
             } else {
-                lo = AFB(x, af.lo, decompLvl);
-                hi = AFB(x, af.hi, decompLvl);
+                lo = AFB(x, fb.af.get(0).lo, decompLvl);
+                hi = AFB(x, fb.af.get(0).hi, decompLvl);
             }    
             waveletData.set(ind, lo);
             waveletData.set(ind + localPair, hi);
@@ -67,7 +69,7 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-    void recompose(int decompLvl, int dimLvl) {
+    public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, 2 - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl;
@@ -76,9 +78,9 @@ public class MRA1DDT extends MRA1D {
             double[] hi = waveletData.get(ind + localPair);
             double[] y  = new double[0];
             if (decompLvl == 0) {
-                y = SFB(lo, hi, fsf.lo, fsf.hi, decompLvl);
+                y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
             } else {
-                y = SFB(lo, hi, sf.lo, sf.hi, decompLvl);
+                y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
             }
             waveletData.set(ind, y);
         }
@@ -91,12 +93,12 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-     void accept(Threshold threshold) {
+     public void accept(Threshold threshold) {
          threshold.visit(this);
     }
 
     @Override
-     double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] AFB(double[] y, double[] filter, int decompLvl) {
         final int N = y.length/2;
         final int L = filter.length;
         y = Shifter.circShift(y, -L/2);
@@ -109,7 +111,7 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-     double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int N = 2*lo.length;
         final int L0 = sfl.length;
         lo = upFirDn.upFirDn(lo, sfl, 2, 1);

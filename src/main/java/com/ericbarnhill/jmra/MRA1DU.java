@@ -5,7 +5,7 @@ import com.ericbarnhill.jvcl.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class MRA1DU extends MRA1D { 
+public class MRA1DU extends MRA1D { 
 
      public MRA1DU(ConvolverFactory.ConvolutionType convType) {
          super(convType);
@@ -16,14 +16,14 @@ class MRA1DU extends MRA1D {
      }
 
      @Override
-     double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] AFB(double[] y, double[] filter, int decompLvl) {
         double[] filterATrous = ArrayMath.divide(aTrous(filter, decompLvl), Math.sqrt(2));
         y = upFirDn.upFirDn(y,filterATrous, 1, 1);
         return y;
      }
 
      @Override
-     double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         double[] sflATrous = ArrayMath.divide(aTrous(sfl, decompLvl), Math.sqrt(2));
         double[] sfhATrous = ArrayMath.divide(aTrous(sfh, decompLvl), Math.sqrt(2));
         int M = (int)Math.pow(2, decompLvl-1);
@@ -37,7 +37,7 @@ class MRA1DU extends MRA1D {
         return y;
     }
 
-    double[] aTrous(double[] filter, int decompLvl) {
+    private double[] aTrous(double[] filter, int decompLvl) {
         final int fi = filter.length;
         final int scaleFactor = (int)Math.pow(2, decompLvl-1);
         double[] aTrousFilter = new double[(fi-1)*scaleFactor + 1];

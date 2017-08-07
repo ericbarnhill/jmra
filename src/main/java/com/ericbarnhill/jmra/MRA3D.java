@@ -12,7 +12,7 @@ import ij.ImageStack;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 
-class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
+public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
 
      int w;
      int h;
@@ -53,6 +53,26 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         initializeWaveletData();
     }
 
+    public MRA3D(double[][][] origData, boolean[][][] maskData, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        super(origData, maskData, decompLvls, convType);
+        this.w = origData.length;
+        this.h = origData[0].length;
+        this.d = origData[0][0].length;
+        this.area = w*h;
+        this.volume = w*h*d;
+        this.wPad = (int)nextPwr2(w);
+        this.hPad = (int)nextPwr2(h);
+        this.dPad = (int)nextPwr2(d);
+        this.areaPad = wPad * hPad;
+        this.volumePad = wPad * hPad * dPad;
+        this.paddedData = ArrayMath.zeroPadBoundaries(origData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.paddedMask = ArrayMath.zeroPadBoundaries(maskData, (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        this.dimLvls = 3;
+        this.stride = 8;
+        mra1d = new MRA1D(convType);
+        initializeWaveletData();
+    }
+
     public MRA3D(double[][][] origData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this(origData, ArrayMath.fillWithTrue(origData.length,origData[0].length, origData[0][0].length), filterBank, decompLvls, convType);
     }
@@ -64,7 +84,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
 
     @Override
-    void decompose(int decompLvl, int dimLvl) {
+    public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl; // starting point
@@ -110,7 +130,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
 
     @Override
-    void recompose(int decompLvl, int dimLvl) {
+    public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
         int localIndex = stride*decompLvl;
@@ -147,7 +167,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
     
     @Override
-    double[][][] AFB(double[][][] data, double[] filter, int decompLvl) {
+    public double[][][] AFB(double[][][] data, double[] filter, int decompLvl) {
         final int fi = data.length;
         final int fj = data[0].length;
         final int fk = data[0][0].length;
@@ -162,7 +182,7 @@ class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     } 
 
     @Override
-    double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
+    public double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int fi = lo.length;
         final int fj = lo[0].length;
         final int fk = lo[0][0].length*2;
