@@ -14,20 +14,19 @@ import ij.process.FloatProcessor;
 
 public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
 
-     int w;
-     int h;
-     int d;
-     int area;
-     int volume;
-     int wPad;
-     int hPad;
-     int dPad;
-     int areaPad;
-     int volumePad;
-     int stride;
-     double[][][] paddedData;
-     boolean[][][] paddedMask;
-     MRA1D mra1d;
+     public int w;
+     public int h;
+     public int d;
+     public int area;
+     public int volume;
+     public int wPad;
+     public int hPad;
+     public int dPad;
+     public int areaPad;
+     public int volumePad;
+     public double[][][] paddedData;
+     public boolean[][][] paddedMask;
+     public MRA1D mra1d;
 
      public MRA3D() {
          super();
@@ -84,86 +83,67 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
 
     @Override
-    public void decompose(int decompLvl, int dimLvl) {
-        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
-        int localPair = localStride / 2;
-        int localIndex = stride*decompLvl; // starting point
-        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
-            double[][][] x = new double[0][][];
-            // figure out where the scaling image is coming from
-            if (dimLvl == 0) {
-                if (decompLvl == 0) {
-                    x = ArrayMath.deepCopy(paddedData);
-                } else {
-                    x = waveletData.get(localIndex - stride);
-                }
+    public ArrayList<double[][][]> getDecomposition(int localIndex, int ind, int decompLvl, int dimLvl, int localStride) {
+        double[][][] x = new double[0][][];
+        if (dimLvl == 0) {
+            if (decompLvl == 0) {
+                x = ArrayMath.deepCopy(paddedData);
             } else {
-                x = waveletData.get(ind);
+                x = waveletData.get(localIndex - stride);
             }
-            // decompose into lo and hi
-            switch(localStride) { // shift dim for y processing. done as a switch block so higher dim code can all use the identical form
-                case 4: 
-                    x = ArrayMath.shiftDim(x, 2);
-                    break;
-                case 2:
-                    x = ArrayMath.shiftDim(x, 1);
-                    break;
-            }
-            double[][][] lo = AFB(x, fb.af.lo, decompLvl);
-            double[][][] hi = AFB(x, fb.af.hi, decompLvl);
-            switch(localStride) {
-                case 4: 
-                    lo = ArrayMath.shiftDim(lo, 1);
-                    hi = ArrayMath.shiftDim(hi, 1);
-                    break;
-                case 2:
-                    lo = ArrayMath.shiftDim(lo, 2);
-                    hi = ArrayMath.shiftDim(hi, 2);
-                    break;
-            }
-            waveletData.set(ind, lo);
-            waveletData.set(ind + localPair, hi);
+        } else {
+            x = waveletData.get(ind);
         }
-        if (dimLvl < dimLvls - 1) {
-            decompose(decompLvl, dimLvl+1);
-       }
+        switch(localStride) {
+            case 4: 
+                x = ArrayMath.shiftDim(x, 1);
+                break;
+            case 2:
+                x = ArrayMath.shiftDim(x, 2);
+                break;
+        }
+        double[][][] lo = AFB(x, fb.af.lo, decompLvl);
+        double[][][] hi = AFB(x, fb.af.hi, decompLvl);
+        switch(localStride) {
+            case 4: 
+                lo = ArrayMath.shiftDim(lo, 2);
+                hi = ArrayMath.shiftDim(hi, 2);
+                break;
+            case 2:
+                lo = ArrayMath.shiftDim(lo, 1);
+                hi = ArrayMath.shiftDim(hi, 1);
+                break;
+        }
+        ArrayList<double[][][]> loAndHi = new ArrayList<double[][][]>();
+        loAndHi.add(lo);
+        loAndHi.add(hi);
+        return loAndHi;
     }
 
     @Override
-    public void recompose(int decompLvl, int dimLvl) {
-        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
-        int localPair = localStride / 2;
-        int localIndex = stride*decompLvl;
-        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
-            double[][][] lo = waveletData.get(ind);
-            double[][][] hi = waveletData.get(ind + localPair);
-            switch (localStride) {
-                case 4: 
-                    lo = ArrayMath.shiftDim(lo, 1);
-                    hi = ArrayMath.shiftDim(hi, 1);
-                    break;
-                case 2:
-                    lo = ArrayMath.shiftDim(lo, 2);
-                    hi = ArrayMath.shiftDim(hi, 2);
-                    break;
-            }
-            double[][][] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
-            switch (localStride) {
-                case 4: 
-                    y = ArrayMath.shiftDim(y, 2);
-                    break;
-                case 2:
-                    y = ArrayMath.shiftDim(y, 1);
-                    break;
-            }
-            waveletData.set(ind, y);
+    public double[][][] getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride) {
+        double[][][] lo = waveletData.get(ind);
+        double[][][] hi = waveletData.get(ind + localPair);
+        switch (localStride) {
+            case 4: 
+                lo = ArrayMath.shiftDim(lo, 1);
+                hi = ArrayMath.shiftDim(hi, 1);
+                break;
+            case 2:
+                lo = ArrayMath.shiftDim(lo, 2);
+                hi = ArrayMath.shiftDim(hi, 2);
+                break;
         }
-        if (dimLvl > 0) {
-            recompose(decompLvl, dimLvl-1);
+        double[][][] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
+        switch (localStride) {
+            case 4: 
+                y = ArrayMath.shiftDim(y, 2);
+                break;
+            case 2:
+                y = ArrayMath.shiftDim(y, 1);
+                break;
         }
-        if (decompLvl > 0) {
-            waveletData.set(stride*(decompLvl-1), waveletData.get(stride*decompLvl));
-        }
+        return y;
     }
     
     @Override

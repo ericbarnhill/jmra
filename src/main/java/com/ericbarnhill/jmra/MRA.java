@@ -64,9 +64,41 @@ public abstract class MRA<N, B, V> {
         }
     }
 
-    abstract public void decompose(int decompLvl, int dimLvl);
+    public void decompose(int decompLvl, int dimLvl) {
+        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
+        int localPair = localStride / 2;
+        int localIndex = stride*decompLvl; // starting point
+        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
+            ArrayList<N> loAndHi = getDecomposition(localIndex, ind, decompLvl, dimLvl, localStride);
+            N lo = loAndHi.get(0);
+            N hi = loAndHi.get(1);
+            waveletData.set(ind, lo);
+            waveletData.set(ind + localPair, hi);
+        }
+        if (dimLvl < dimLvls - 1) {
+            decompose(decompLvl, dimLvl+1);
+       }
+    }
 
-    abstract public void recompose(int decompLvl, int dimLvl);
+    abstract public ArrayList<N> getDecomposition(int localIndex, int ind, int decompLvl, int dimLvl, int localStride);
+
+    public void recompose(int decompLvl, int dimLvl) {
+        int localStride = (int)Math.pow(2, dimLvls - dimLvl);
+        int localPair = localStride / 2;
+        int localIndex = stride*decompLvl;
+        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
+            N y = getRecomposition(localPair, ind, decompLvl, dimLvl, localStride);
+            waveletData.set(ind, y);
+        }
+        if (dimLvl > 0) {
+            recompose(decompLvl, dimLvl-1);
+        }
+        if (decompLvl > 0) {
+            waveletData.set(stride*(decompLvl-1), waveletData.get(stride*decompLvl));
+        }
+    }
+
+    abstract public N getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride);
 
     abstract public N AFB(N y, V filter, int decompLvl);
 

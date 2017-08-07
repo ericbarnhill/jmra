@@ -22,6 +22,8 @@ abstract class DualTree<N, B, V> {
         this.fb = fb;
         this.decompLvls = decompLvls;
         this.convType = convType;
+        trees = new ArrayList<MRA<N, B, V>>();
+        banks = new ArrayList<DTFilterBank>();
         setTrees();
     }
 

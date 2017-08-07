@@ -16,6 +16,10 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
         this.stride = 4;
     }
 
+    public DualTree2DCplx(double[][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length) , fb, decompLvls, convType);
+    }
+
     public void setTrees() {
         int[][] bankIndices = { {0, 0}, {1, 0}, {0, 0}, {1, 0}, {0, 1}, {1, 1}, {0, 1}, {1, 1} };
         for (int[] indices : bankIndices) {

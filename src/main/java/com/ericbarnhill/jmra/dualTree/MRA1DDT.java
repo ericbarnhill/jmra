@@ -34,62 +34,43 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-    public void decompose(int decompLvl, int dimLvl) {
-        int localStride = (int)Math.pow(2, 2 - dimLvl); // 4 for dimLvl 0, 2 for dimLvl 1
-        int localPair = localStride / 2;
-        int localIndex = stride*decompLvl; // starting point
-        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
-            double[] x = new double[0];
-            // figure out where the scaling image is coming from
-            if (dimLvl == 0) {
-                if (decompLvl == 0) {
-                    x = ArrayMath.deepCopy(paddedData);
-                } else {
-                    x = waveletData.get(localIndex - stride);
-                }
-            } else {
-                x = waveletData.get(ind);
-            }
-            // decompose into lo and hi
-            double[] lo = new double[0];
-            double[] hi = new double[0];
+    public ArrayList<double[]> getDecomposition(int localIndex, int ind, int decompLvl, int dimLvl, int localStride) {
+        double[] x = new double[0];
+        if (dimLvl == 0) {
             if (decompLvl == 0) {
-                lo = AFB(x, fb.faf.get(0).lo, decompLvl);
-                hi = AFB(x, fb.faf.get(0).hi, decompLvl);
+                x = ArrayMath.deepCopy(paddedData);
             } else {
-                lo = AFB(x, fb.af.get(0).lo, decompLvl);
-                hi = AFB(x, fb.af.get(0).hi, decompLvl);
-            }    
-            waveletData.set(ind, lo);
-            waveletData.set(ind + localPair, hi);
+                x = waveletData.get(localIndex - stride);
+            }
+        } else {
+            x = waveletData.get(ind);
         }
-        if (dimLvl < dimLvls - 1) {
-            decompose(decompLvl, dimLvl+1);
-        }
+        double[] lo = new double[0];
+        double[] hi = new double[0];
+        if (decompLvl == 0) {
+            lo = AFB(x, fb.faf.get(0).lo, decompLvl);
+            hi = AFB(x, fb.faf.get(0).hi, decompLvl);
+        } else {
+            lo = AFB(x, fb.af.get(0).lo, decompLvl);
+            hi = AFB(x, fb.af.get(0).hi, decompLvl);
+        }    
+        ArrayList<double[]> loAndHi = new ArrayList<double[]>();
+        loAndHi.add(lo);
+        loAndHi.add(hi);
+        return loAndHi;
     }
 
     @Override
-    public void recompose(int decompLvl, int dimLvl) {
-        int localStride = (int)Math.pow(2, 2 - dimLvl);
-        int localPair = localStride / 2;
-        int localIndex = stride*decompLvl;
-        for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
-            double[] lo = waveletData.get(ind);
-            double[] hi = waveletData.get(ind + localPair);
-            double[] y  = new double[0];
-            if (decompLvl == 0) {
-                y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
-            } else {
-                y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
-            }
-            waveletData.set(ind, y);
+    public double[] getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride) {
+        double[] lo = waveletData.get(ind);
+        double[] hi = waveletData.get(ind + localPair);
+        double[] y  = new double[0];
+        if (decompLvl == 0) {
+            y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
+        } else {
+            y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
         }
-        if (dimLvl > 0) {
-            recompose(decompLvl, dimLvl-1);
-        } else if (decompLvl > 0) {
-            System.out.println("Moving from "+stride*decompLvl+" to "+stride*(decompLvl-1));
-            waveletData.set(stride*(decompLvl-1), waveletData.get(stride*decompLvl));
-        }
+        return y;
     }
 
     @Override

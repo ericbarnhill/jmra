@@ -12,7 +12,7 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 
-class MRA2DDTU extends MRA2DDT {
+public class MRA2DDTU extends MRA2DDT {
 
     MRA2DU mra2du;
 

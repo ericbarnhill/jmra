@@ -48,9 +48,6 @@ public class MRA3DU extends MRA3D {
         final int fi = lo.length;
         final int fj = lo[0].length;
         double[][][] y = new double[fi][fj][];
-        //DEBUGGING
-        ArrayMath.displaySize(lo);
-        ArrayMath.displaySize(hi);
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
                 y[i][j] = mra1du.SFB(lo[i][j], hi[i][j], sfl, sfh, decompositionLevel);
