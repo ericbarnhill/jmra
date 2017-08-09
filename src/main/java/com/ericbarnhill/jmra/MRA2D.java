@@ -23,8 +23,9 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
     public double[][] paddedData;
     public boolean[][] paddedMask;
 
-    public MRA2D() {
-        super();
+    public MRA2D(ConvolverFactory.ConvolutionType convType) {
+        super(convType);
+        mra1d = new MRA1D(convType);
     }
 
     public MRA2D(double[][] origData, boolean[][] maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
@@ -145,6 +146,11 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
 
     public void accept(Threshold threshold) {
         threshold.visit(this);
+    }
+
+    @Override
+    public double[][] getFilteredData() {
+        return ArrayMath.stripBorderPadding(waveletData.get(0), (wPad - w)/2, (hPad - h)/2);
     }
 
     // for debugging and testing

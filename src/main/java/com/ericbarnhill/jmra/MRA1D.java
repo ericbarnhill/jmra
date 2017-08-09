@@ -106,5 +106,10 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
         return y;
      }
 
+    @Override
+    public double[] getFilteredData() {
+        return ArrayMath.stripBorderPadding(waveletData.get(0), (wPad - w)/2);
+    }
+
 
 }

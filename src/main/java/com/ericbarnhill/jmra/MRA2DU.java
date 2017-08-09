@@ -15,8 +15,9 @@ public class MRA2DU extends MRA2D {
 
     MRA1DU mra1du;
 
-    public MRA2DU() {
-        super();
+    public MRA2DU(ConvolverFactory.ConvolutionType convType) {
+        super(convType);
+        mra1du = new MRA1DU(convType);
     }
 
     public MRA2DU(double[][] origData, boolean[][] maskData, FilterBank filterBank, int decompLvls, ConvolverFactory.ConvolutionType convType) {
@@ -36,7 +37,8 @@ public class MRA2DU extends MRA2D {
         final int N = filter.length;
         double[][] filtData = new double[fi][];
         for (int i = 0; i < fi; i++) {
-            filtData[i] = mra1du.AFB(data[i], filter, J);
+            //filtData[i] = mra1du.AFB(data[i], filter, J);
+            filtData[i] = mra1d.AFB(data[i], filter, J);
         }
         return filtData;
     }
@@ -49,13 +51,19 @@ public class MRA2DU extends MRA2D {
         final int fj = lo[0].length;
         double[][] y = new double[fi][];
         for (int i = 0; i < fi; i++) {
-            y[i] = mra1du.SFB(lo[i], hi[i], sfl, sfh, J);
+            //y[i] = mra1du.SFB(lo[i], hi[i], sfl, sfh, J);
+            y[i] = mra1d.SFB(lo[i], hi[i], sfl, sfh, J);
         }
         return y;
     }
 
     public void accept(Threshold threshold) {
         threshold.visit(this);
+    }
+
+    @Override
+    public double[][] getFilteredData() {
+        return waveletData.get(0);
     }
 
     // for debugging and testing

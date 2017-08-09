@@ -1,3 +1,4 @@
 com/ericbarnhill/jmra/TestMRAUNoThresh.class
-com/ericbarnhill/jmra/TestDualTreeNoThresh.class
+com/ericbarnhill/jmra/TestDualTreeThresh.class
 com/ericbarnhill/jmra/TestMRANoThresh.class
+com/ericbarnhill/jmra/TestDualTreeNoThresh.class

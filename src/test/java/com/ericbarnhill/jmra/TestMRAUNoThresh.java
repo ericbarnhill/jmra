@@ -109,13 +109,21 @@ public class TestMRAUNoThresh{
         MRA3DU mra = new MRA3DU(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU);
         mra.dwt();
         ArrayList<double[][][]> decomp = mra.getDecomposition();
-        System.out.println("3d decomp size "+decomp.size());
+        /*
         for (int n = 0; n < decomp.size(); n++) {
-            String path = root + Integer.toString(n)+ "_before_3d.tif";
+            String path = root + Integer.toString(n)+ "_before_3d_u.tif";
             mra.data2File(decomp.get(n), path);
         }
+        */
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
+        /*
+        ArrayList<double[][][]> decomp2= mra.getDecomposition();
+        for (int n = 0; n < decomp2.size(); n++) {
+            String path = root + Integer.toString(n)+ "_after_3d_u.tif";
+            //mra.data2File(decomp2.get(n), path);
+        }
+        */
         double[][][] filteredData = mra.getFilteredData();
         mra.data2File(filteredData, root+"filtdata_3d_u.tif");
         /*

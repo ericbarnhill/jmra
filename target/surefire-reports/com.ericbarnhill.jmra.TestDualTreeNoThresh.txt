@@ -1,13 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestDualTreeNoThresh
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.01 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestDualTreeNoThresh
-DualTree3DTest(com.ericbarnhill.jmra.TestDualTreeNoThresh)  Time elapsed: 1.029 sec  <<< ERROR!
-java.lang.IndexOutOfBoundsException: Index: 5, Size: 4
-	at java.util.ArrayList.rangeCheck(ArrayList.java:653)
-	at java.util.ArrayList.get(ArrayList.java:429)
-	at com.ericbarnhill.jmra.dualTree.DualTree3DCplx.addSubtractFwd(DualTree3DCplx.java:85)
-	at com.ericbarnhill.jmra.dualTree.DualTree3DCplx.addSubtract(DualTree3DCplx.java:68)
-	at com.ericbarnhill.jmra.dualTree.DualTree3DCplx.dwt(DualTree3DCplx.java:56)
-	at com.ericbarnhill.jmra.TestDualTreeNoThresh.DualTree3DTest(TestDualTreeNoThresh.java:168)
-
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 42.343 s - in com.ericbarnhill.jmra.TestDualTreeNoThresh

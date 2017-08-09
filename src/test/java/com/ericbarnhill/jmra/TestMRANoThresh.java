@@ -110,11 +110,12 @@ public class TestMRANoThresh{
         MRA3D mra = new MRA3D(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU);
         mra.dwt();
         ArrayList<double[][][]> decomp = mra.getDecomposition();
+        /*
         System.out.println("3d decomp size "+decomp.size());
         for (int n = 0; n < decomp.size(); n++) {
             String path = root + Integer.toString(n)+ "_before_3d.tif";
             mra.data2File(decomp.get(n), path);
-        }
+        }*/
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();

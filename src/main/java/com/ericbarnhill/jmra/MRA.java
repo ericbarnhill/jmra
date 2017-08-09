@@ -110,9 +110,7 @@ public abstract class MRA<N, B, V> {
         return origData;
     }
 
-    public N getFilteredData() {
-        return waveletData.get(0);
-    }
+    abstract public N getFilteredData();
 
     public ArrayList<N> getDecomposition() {
         return waveletData;

@@ -152,7 +152,7 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         final int fj = data[0].length;
         final int fk = data[0][0].length;
         final int fk2 = fk / 2;
-        double[][][] filtData = new double[fi][fj][fk];
+        double[][][] filtData = new double[fi][fj][];
         for (int i = 0; i < fi; i++) { 
             for (int j = 0; j < fj; j++) {
                 filtData[i][j] = mra1d.AFB(data[i][j], filter, decompLvl); 
@@ -166,7 +166,7 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         final int fi = lo.length;
         final int fj = lo[0].length;
         final int fk = lo[0][0].length*2;
-        double[][][] y = new double[fi][fj][fk];
+        double[][][] y = new double[fi][fj][];
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
                 y[i][j] = mra1d.SFB(lo[i][j], hi[i][j], sfl, sfh, decompLvl);
@@ -201,9 +201,9 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         fs.saveAsTiff(path);
     }
 
-
-
-        
-
+    @Override
+    public double[][][] getFilteredData() {
+        return ArrayMath.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+    }
 
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import com.ericbarnhill.arrayMath.ArrayMath;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
+import org.apache.commons.math4.stat.descriptive.moment.Mean;
 import org.apache.commons.numbers.complex.Complex;
 import org.apache.commons.numbers.complex.ComplexUtils;
 import com.ericbarnhill.jmra.dualTree.*;
@@ -128,23 +129,48 @@ public class Threshold {
         }
     }
 
-    /*
-    public void visit(DualTree1D dt1d) {
-        for (int i = 0; i < dt1d.tree1R.waveletData.size(); i++) {
-            if (i % dt1d.tree1R.stride != 0) {
-                Complex[] tree1 = ComplexUtils.split2Complex(dt1d.tree1R.waveletData.get(i), dt1d.tree1I.waveletData.get(i));
-                Complex[] tree2 = ComplexUtils.split2Complex(dt1d.tree2R.waveletData.get(i), dt1d.tree2I.waveletData.get(i));
-                boolean[] mask = dt1d.tree1R.maskData;
-                tree1 = threshold(tree1, mask);
-                tree2 = threshold(tree2, mask);
-                dt1d.tree1R.waveletData.set(i, ComplexUtils.complex2Real(tree1));
-                dt1d.tree1I.waveletData.set(i, ComplexUtils.complex2Imaginary(tree1));
-                dt1d.tree2R.waveletData.set(i, ComplexUtils.complex2Real(tree2));
-                dt1d.tree2I.waveletData.set(i, ComplexUtils.complex2Real(tree2));
+    public void visit(DualTree2DCplx dt2d) {
+        final int STRIDE = 4;
+        final int M = 10;
+        if (dt2d.undecimated) {
+            final int sz = dt2d.trees.size();
+            final int decompSz = dt2d.trees.get(0).waveletData.size();
+            for (int i = 0; i < sz; i += 2) {
+                for (int j = 0; j < decompSz; j++) {
+                    int decompLvl = (int)Math.floor(j / STRIDE);
+                    int filterWidth = M * (int)Math.pow(2, decompLvl);
+                    if (j % STRIDE != 0) {
+                        final int w = dt2d.trees.get(i).waveletData.get(j).length;
+                        Complex[] complexTreeVec = ArrayMath.vectorize(ComplexUtils.split2Complex(dt2d.trees.get(i).waveletData.get(j), dt2d.trees.get(i+1).waveletData.get(j)));
+                        boolean[] maskVec = ArrayMath.vectorize(ArrayMath.zeroPadBoundaries(dt2d.trees.get(i).maskData, filterWidth / 2, filterWidth / 2 - 1)); // assume both masks are the same
+                        complexTreeVec = threshold(complexTreeVec, maskVec);
+                        dt2d.trees.get(i).waveletData.set(j, ArrayMath.devectorize(ComplexUtils.complex2Real(complexTreeVec), w));
+                        dt2d.trees.get(i+1).waveletData.set(j, ArrayMath.devectorize(ComplexUtils.complex2Imaginary(complexTreeVec), w));
+                    }
+                }
+            }
+        }
+        //DEBUGGING
+        System.out.println("visit over");
+    }
+
+    public void visit(DualTree3DCplx dt3d) {
+        if (dt3d.undecimated) {
+            final int sz = dt3d.trees.size();
+            final int decompSz = dt3d.trees.get(0).waveletData.size();
+            for (int i = 0; i < sz; i += 2) {
+                for (int j = 0; j < decompSz; j++) {
+                    final int w = dt3d.trees.get(i).waveletData.get(j).length;
+                    final int h = dt3d.trees.get(i).waveletData.get(j)[0].length;
+                    Complex[] complexTreeVec = ArrayMath.vectorize(ComplexUtils.split2Complex(dt3d.trees.get(i).waveletData.get(j), dt3d.trees.get(i+1).waveletData.get(j)));
+                    boolean[] maskVec = ArrayMath.vectorize(dt3d.trees.get(i).maskData); // assume both masks are the same
+                    complexTreeVec = threshold(complexTreeVec, maskVec);
+                    dt3d.trees.get(i).waveletData.set(j, ArrayMath.devectorize(ComplexUtils.complex2Real(complexTreeVec), w, h));
+                    dt3d.trees.get(i+1).waveletData.set(j, ArrayMath.devectorize(ComplexUtils.complex2Imaginary(complexTreeVec), w, h));
+                }
             }
         }
     }
-     */           
 
     public  double[] threshold(double[] data, boolean[] mask) {
         double sigma = estimateSigma(data, mask);
@@ -159,7 +185,7 @@ public class Threshold {
         return thresholdedPixels;
     }
 
-    public  double[] applyThresh(double[] data, double sigma) {
+    public double[] applyThresh(double[] data, double sigma) {
         int w = data.length;
         double[] threshedImage = new double[w];
         for (int i = 0; i < w; i++) {
@@ -184,9 +210,9 @@ public class Threshold {
         return threshedImage;
     }
 
-    public  Complex[] applyThresh(Complex[] data, double sigma) {
+    public Complex[] applyThresh(Complex[] data, double sigma) {
         int w = data.length;
-        Complex[] threshedImage = new Complex[w];
+        Complex[] threshedImage = ComplexUtils.initialize(new Complex[w]);
         for (int i = 0; i < w; i++) {
             switch(threshMeth) {
                 case HARD:
@@ -202,8 +228,7 @@ public class Threshold {
                     break;
                 case NNG:
                     if (data[i].abs() > sigma) {
-                        double magnitude = (data[i].abs()- sigma*sigma/data[i].abs());
-                        threshedImage[i] = data[i].multiply(magnitude / (magnitude + sigma));
+                        threshedImage[i] = data[i].subtract(data[i].conj().reciprocal().multiply(sigma*sigma));
                     }
                     break;
             }
@@ -227,7 +252,7 @@ public class Threshold {
         double[] maskedPixels = maskPixels(data, mask);
         double sigma = 0;
         int N = maskedPixels.length;
-            double robustNoiseEst = noiseEst(maskedPixels);
+            double robustNoiseEst = noiseEst(data);
                 switch (noiseEstMeth) {
             case VISU_SHRINK:
                 sigma = universalThreshold(maskedPixels, robustNoiseEst);
@@ -291,7 +316,7 @@ public class Threshold {
         }
         double[] maskedPixels = new double[numTrue];
         int maskedPixelsIndex = 0;
-        for (int i = 0; i < mask.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             if (mask[i]) {
                 maskedPixels[maskedPixelsIndex++] = data[i];
             }

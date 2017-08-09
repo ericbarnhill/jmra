@@ -7,8 +7,8 @@ import com.ericbarnhill.arrayMath.*;
 
 public class DualTree1D extends DualTree<double[], boolean[], double[]> {
 
-    public DualTree1D(double[] origData, boolean[] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, fb, decompLvls, convType);
+    public DualTree1D(double[] origData, boolean[] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
+        super(origData, maskData, fb, decompLvls, convType, undecimated);
     }
 
     public void setTrees() {

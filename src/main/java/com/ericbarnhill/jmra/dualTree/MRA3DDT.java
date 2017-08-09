@@ -74,9 +74,6 @@ public class MRA3DDT extends MRA3D {
                 hi = ArrayMath.shiftDim(hi, 1);
                 break;
         }
-        // DEBUGGING
-        ArrayMath.displaySize(lo);
-        ArrayMath.displaySize(hi);
         ArrayList<double[][][]> loAndHi = new ArrayList<double[][][]>();
         loAndHi.add(lo);
         loAndHi.add(hi);

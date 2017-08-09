@@ -11,15 +11,17 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
 
     private final int stride;
 
-    public DualTree3DCplx(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, fb, decompLvls, convType);
+    public DualTree3DCplx(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
+        super(origData, maskData, fb, decompLvls, convType, undecimated);
         this.stride = 8;
+        setTrees();
     }
 
-    public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), fb, decompLvls, convType);
+    public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), fb, decompLvls, convType, undecimated);
     }
 
+    @Override
     public void setTrees() {
         int[][] bankIndices = { {0, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 0, 1}, {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1} };
         for (int[] indices : bankIndices) {
@@ -36,7 +38,11 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
             banks.add(new DTFilterBank(faf, fsf, af, sf));
         }
         for (DTFilterBank bank : banks) {
-            trees.add(new MRA3DDT(origData, maskData, bank, decompLvls, convType));
+            if (undecimated) {
+                trees.add(new MRA3DDTU(origData, maskData, bank, decompLvls, convType));
+            } else {
+                trees.add(new MRA3DDT(origData, maskData, bank, decompLvls, convType));
+            }
         }
     }
 
@@ -63,6 +69,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         }
     }
 
+    public void accept(Threshold threshold) {
+        threshold.visit(this);
+    }
+
     public void addSubtract(boolean fwd) {
         if (fwd) {
             addSubtractFwd();
@@ -82,9 +92,9 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                         trees.get(6).waveletData.get(i));
 
                 trees.get(0).waveletData.set(i, pm1.get(0));
-                trees.get(5).waveletData.set(i, pm1.get(5));
-                trees.get(3).waveletData.set(i, pm1.get(3));
-                trees.get(6).waveletData.set(i, pm1.get(6));
+                trees.get(5).waveletData.set(i, pm1.get(1));
+                trees.get(3).waveletData.set(i, pm1.get(2));
+                trees.get(6).waveletData.set(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4(
                         trees.get(8).waveletData.get(i), 
@@ -92,10 +102,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(i, pm1.get(8));
-                trees.get(2).waveletData.set(i, pm1.get(2));
-                trees.get(4).waveletData.set(i, pm1.get(4));
-                trees.get(1).waveletData.set(i, pm1.get(1));
+                trees.get(8).waveletData.set(i, pm1.get(0));
+                trees.get(2).waveletData.set(i, pm1.get(1));
+                trees.get(4).waveletData.set(i, pm1.get(2));
+                trees.get(1).waveletData.set(i, pm1.get(3));
 
             }
         }
@@ -112,9 +122,9 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                         trees.get(6).waveletData.get(i));
 
                 trees.get(0).waveletData.set(i, pm1.get(0));
-                trees.get(5).waveletData.set(i, pm1.get(5));
-                trees.get(3).waveletData.set(i, pm1.get(3));
-                trees.get(6).waveletData.set(i, pm1.get(6));
+                trees.get(5).waveletData.set(i, pm1.get(1));
+                trees.get(3).waveletData.set(i, pm1.get(2));
+                trees.get(6).waveletData.set(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4inv(
                         trees.get(8).waveletData.get(i), 
@@ -122,10 +132,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(i, pm1.get(8));
-                trees.get(2).waveletData.set(i, pm1.get(2));
-                trees.get(4).waveletData.set(i, pm1.get(4));
-                trees.get(1).waveletData.set(i, pm1.get(1));
+                trees.get(8).waveletData.set(i, pm1.get(0));
+                trees.get(2).waveletData.set(i, pm1.get(1));
+                trees.get(4).waveletData.set(i, pm1.get(2));
+                trees.get(1).waveletData.set(i, pm1.get(3));
 
             }
         }

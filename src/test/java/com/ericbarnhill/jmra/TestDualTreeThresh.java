@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import com.ericbarnhill.arrayMath.ArrayMath;
 import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.filters.*;
+import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.dualTree.*;
 import com.ericbarnhill.niftijio.*;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
 
-public class TestDualTreeNoThresh{
+public class TestDualTreeThresh{
 
 
     static double[][] image2Array(String path) {
@@ -69,8 +70,6 @@ public class TestDualTreeNoThresh{
         mra.dwt();
         List<double[][]> decomp = mra.getDecomposition();
         
-        //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
-
         mra.idwt();
         /*
         for (int n = 0; n < decomp.size(); n++) {
@@ -79,13 +78,13 @@ public class TestDualTreeNoThresh{
         }
         */
         image = mra.getFilteredData();
-        String resultFile = root + "lena_dt_idwt.tif";
+        String resultFile = root + "lena_mra2ddt_idwt.tif";
         array2Image(image, resultFile);
     }
 
     @Test
-    public void DualTree2DTest() {
-        System.out.println("NO Thresh DualTree 2D Test");
+    public void MRA2DTUTest() {
+        System.out.println("MRA2DDTU Test");
         // PREP IMAGE
         String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
         String testFile = root + "lena.tif";
@@ -93,7 +92,34 @@ public class TestDualTreeNoThresh{
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
-        DualTree2DCplx dt = new DualTree2DCplx(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, true);
+        MRA2DDTU mra = new MRA2DDTU(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU);
+        mra.dwt();
+        List<double[][]> decomp = mra.getDecomposition();
+        
+        mra.idwt();
+        /*
+        for (int n = 0; n < decomp.size(); n++) {
+            String path = "/home/ericbarnhill/Documents/code/" + Integer.toString(n)+ "_after.tif";
+            array2Image(decomp.get(n), path);
+        }
+        */
+        image = mra.getFilteredData();
+        String resultFile = root + "lena_dtu_idwt.tif";
+        array2Image(image, resultFile);
+    }
+
+    @Test
+    public void DualTree2DTest() {
+        System.out.println("Thresh DT2D");
+        // PREP IMAGE
+        String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
+        String testFile = root + "lena.tif";
+        double[][] image = image2Array(testFile);
+        // PREP MRA
+        DTFilterBank fb = Wavelets.getFarrasKingsbury();
+        double[][] noise = ArrayMath.multiply(ArrayMath.fillWithRandom(image.length, image[0].length),100);
+        double[][] noisyImg = ArrayMath.add(image, noise);
+        DualTree2DCplx dt = new DualTree2DCplx(noisyImg, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, true);
         dt.dwt();
         /*
         System.out.println("Displaying trees and decomp sizes: "); 
@@ -107,9 +133,9 @@ public class TestDualTreeNoThresh{
             }
         }
         */
-       
-        //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
-
+        Threshold t = new Threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
+        dt.accept(t);
+        System.out.println("back in test method");
         dt.idwt();
         /*
         for (int n = 0; n < decomp.size(); n++) {
@@ -118,13 +144,14 @@ public class TestDualTreeNoThresh{
         }
         */
         image = dt.getFilteredData();
-        String resultFile = root + "lena_dualtree_idwt.tif";
+        String resultFile = root + "lena_mra2ddtu_idwt_thresh.tif";
         array2Image(image, resultFile);
+        System.out.println("done with 2d test");
     }
 
+    /*
     @Test
     public void MRA3DDTTest() {
-        System.out.println("No Thresh MRE3DDT Test");
         // PREP IMAGE
         String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
         String filepath = "/home/ericbarnhill/Documents/MATLAB/ericbarnhill/projects/2017-07-06-florian-new-protocol/scratch/fieldmaps/3.nii";
@@ -148,10 +175,11 @@ public class TestDualTreeNoThresh{
         double[][][] filteredData = mra.getFilteredData();
         mra.data2File(filteredData, root+"filtdata_3d_dt.tif");
     }
+    */
 
     @Test
     public void DualTree3DTest() {
-        System.out.println("No Thresh DT3D");
+        System.out.println("Thresh DT3D");
         String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
         String filepath = "/home/ericbarnhill/Documents/MATLAB/ericbarnhill/projects/2017-07-06-florian-new-protocol/scratch/fieldmaps/3.nii";
         String outputpath = "/home/ericbarnhill/Documents/code/jmra/test-images/test_3DDT.nii";
@@ -163,9 +191,6 @@ public class TestDualTreeNoThresh{
         }
         double[][][][] niftiArray = nv.data.toArray();
         double[][][] image = ArrayMath.convert4dto3d(niftiArray);
-        // PREP MRA
-        DTFilterBank fb = Wavelets.getFarrasKingsbury();
-        //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
         double[][][] imageCropped = new double[32][32][8];
         for (int i = 0; i < 32; i++) {
             for (int j = 0; j < 32; j++) {
@@ -174,33 +199,21 @@ public class TestDualTreeNoThresh{
                 }
             }
         }
+
+        // PREP MRA
+        DTFilterBank fb = Wavelets.getFarrasKingsbury();
+        //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
         DualTree3DCplx dt = new DualTree3DCplx(imageCropped, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, true);
         dt.dwt();
-        /*
-        System.out.println("Displaying trees and decomp sizes: "); 
-        for (int i = 0; i < dt.trees.size(); i++) {
-            MRA<double[][], boolean[][], double[]> tree = dt.trees.get(i);
-            ArrayList<double[][]> decomp = tree.getDecomposition();
-            for (int j = 0; j < decomp.size(); j++) {
-                ArrayMath.displaySize(decomp.get(j));
-                String path = root + Integer.toString(j)+ "_before_dualtree.tif";
-                array2Image(decomp.get(j), path);
-            }
-        }
-        */
-       
-        //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
-
+        System.out.println("Decomposition completed");
+        Threshold t = new Threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
+        dt.accept(t);
         dt.idwt();
-        /*
-        for (int n = 0; n < decomp.size(); n++) {
-            String path = "/home/ericbarnhill/Documents/code/" + Integer.toString(n)+ "_after.tif";
-            array2Image(decomp.get(n), path);
-        }
-        */
+        
         image = dt.getFilteredData();
-        String resultFile = root + "dualtree3d_filt.tif";
+        String resultFile = root + "dt3d_thresh.tif";
         new MRA3D().data2File(image, resultFile);
+        System.out.println("done with test");
     }
 
 }

@@ -11,15 +11,16 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
 
     private final int stride;
 
-    public DualTree2DCplx(double[][] origData, boolean[][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        super(origData, maskData, fb, decompLvls, convType);
+    public DualTree2DCplx(double[][] origData, boolean[][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
+        super(origData, maskData, fb, decompLvls, convType, undecimated);
         this.stride = 4;
     }
 
-    public DualTree2DCplx(double[][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
-        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length) , fb, decompLvls, convType);
+    public DualTree2DCplx(double[][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length) , fb, decompLvls, convType, undecimated);
     }
 
+    @Override
     public void setTrees() {
         int[][] bankIndices = { {0, 0}, {1, 0}, {0, 0}, {1, 0}, {0, 1}, {1, 1}, {0, 1}, {1, 1} };
         for (int[] indices : bankIndices) {
@@ -36,7 +37,11 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
             banks.add(new DTFilterBank(faf, fsf, af, sf));
         }
         for (DTFilterBank bank : banks) {
-            trees.add(new MRA2DDT(origData, maskData, bank, decompLvls, convType));
+            if (undecimated) {
+                trees.add(new MRA2DDTU(origData, maskData, bank, decompLvls, convType));
+            } else {
+                trees.add(new MRA2DDT(origData, maskData, bank, decompLvls, convType));
+            }
         }
     }
 
@@ -53,14 +58,18 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();
         }
-        addSubtract(true);
+        //addSubtract(true);
     }
 
     public void idwt() {
-        addSubtract(false);
+        //addSubtract(false);
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).idwt();
         }
+    }
+
+    public void accept(Threshold threshold) {
+        threshold.visit(this);
     }
 
     public void addSubtract(boolean fwd) {

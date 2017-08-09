@@ -18,7 +18,7 @@ public class MRA3DDTU extends MRA3DDT {
 
     public MRA3DDTU(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         super(origData, maskData, fb, decompLvls, convType);
-        mra3du = new MRA3DU();
+        mra3du = new MRA3DU(convType);
     }
 
     public MRA3DDTU(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
