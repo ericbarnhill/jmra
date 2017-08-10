@@ -1,8 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestDualTreeThresh
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 18.526 s <<< FAILURE! - in com.ericbarnhill.jmra.TestDualTreeThresh
-DualTree3DTest(com.ericbarnhill.jmra.TestDualTreeThresh)  Time elapsed: 17.552 s  <<< ERROR!
-java.lang.ArrayIndexOutOfBoundsException: 8192
-	at com.ericbarnhill.jmra.TestDualTreeThresh.DualTree3DTest(TestDualTreeThresh.java:210)
-
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 133.378 sec - in com.ericbarnhill.jmra.TestDualTreeThresh

@@ -21,45 +21,10 @@ import org.apache.commons.math4.stat.descriptive.rank.Median;
 
 public class TestMRAUNoThresh{
 
-
-    static double[][] image2Array(String path) {
-        try {
-            ImagePlus ip = new Opener().openImage(path);
-            ImageProcessor ipr = ip.getProcessor();
-            int w = ip.getWidth();
-            int h = ip.getHeight();
-            double[][] array = new double[w][h];
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
-                    array[i][j] = (double)ipr.getPixelValue(i,j);
-                }
-            }
-            return array;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    static void array2Image(double[][] array, String path) {
-        int w = array.length;
-        int h = array[0].length;
-        FloatProcessor fp = new FloatProcessor(w,h);
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                fp.putPixelValue(i,j,array[i][j]);
-            }
-        }
-        ImagePlus ip = new ImagePlus("", fp);
-        FileSaver fs = new FileSaver(ip);
-        fs.saveAsTiff(path);
-    }
-
     @Test
     public void MRA2DUTest() {
         // PREP IMAGE
-        String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
-        String testFile = root + "lena.tif";
-        double[][] image = image2Array(testFile);
+        double[][] image = FilePaths.image2Array(FilePaths.image2D);
         // PREP MRA
         FilterBank fb = Wavelets.getFarras();
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
@@ -84,20 +49,17 @@ public class TestMRAUNoThresh{
         }
         */
         double[][] filtImage = mra.getFilteredData();
-        String resultFile = root + "lena_idwt_u.tif";
-        array2Image(filtImage, resultFile);
+        String resultFile = FilePaths.root + "lena_idwt_u.tif";
+        FilePaths.array2Image(filtImage, resultFile);
     }
 
-    @Test
+    @Ignore
     public void MRA3DUTest() {
         System.out.println("MRA 3DU Test");
         // PREP IMAGE
-        String filepath = "/home/ericbarnhill/Documents/MATLAB/ericbarnhill/projects/2017-07-06-florian-new-protocol/scratch/fieldmaps/3.nii";
-        String root = "/home/ericbarnhill/Documents/code/jmra/test-images/"; 
-        String outputpath = "/home/ericbarnhill/Documents/code/jmra/test-images/test_3d_u.nii";
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(filepath);
+            nv  = NiftiVolume.read(FilePaths.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,32 +71,10 @@ public class TestMRAUNoThresh{
         MRA3DU mra = new MRA3DU(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU);
         mra.dwt();
         ArrayList<double[][][]> decomp = mra.getDecomposition();
-        /*
-        for (int n = 0; n < decomp.size(); n++) {
-            String path = root + Integer.toString(n)+ "_before_3d_u.tif";
-            mra.data2File(decomp.get(n), path);
-        }
-        */
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
-        /*
-        ArrayList<double[][][]> decomp2= mra.getDecomposition();
-        for (int n = 0; n < decomp2.size(); n++) {
-            String path = root + Integer.toString(n)+ "_after_3d_u.tif";
-            //mra.data2File(decomp2.get(n), path);
-        }
-        */
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, root+"filtdata_3d_u.tif");
-        /*
-        nv.data = new FourDimensionalArray(ArrayMath.convertTo4d(filteredData));
-        nv.header.dim[4] = 1;
-        try {
-            nv.write(outputpath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
+        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
     }
 }
 

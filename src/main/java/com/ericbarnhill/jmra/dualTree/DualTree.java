@@ -26,7 +26,6 @@ abstract class DualTree<N, B, V> {
         this.undecimated = undecimated;
         trees = new ArrayList<MRA<N, B, V>>();
         banks = new ArrayList<DTFilterBank>();
-        setTrees();
     }
 
     public abstract void setTrees();

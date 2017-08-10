@@ -9,12 +9,11 @@ import com.ericbarnhill.jmra.filters.*;
 public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double[]> {
 
 
-    private final int stride;
+    int stride;
 
     public DualTree3DCplx(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
         super(origData, maskData, fb, decompLvls, convType, undecimated);
         this.stride = 8;
-        setTrees();
     }
 
     public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
@@ -47,6 +46,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
     }
 
     public double[][][] getFilteredData() {
+        System.out.println("in dualtree get filtered data");
         double[][][] bankSum = new double[origData.length][origData[0].length][origData[0][0].length];
         for (MRA<double[][][], boolean[][][], double[]> tree : trees) {
             bankSum = ArrayMath.add(bankSum, tree.getFilteredData());
@@ -56,6 +56,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
     }
 
     public void dwt() {
+        setTrees();
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();
         }
@@ -81,7 +82,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         }
     }
 
-    private void addSubtractFwd() {
+    void addSubtractFwd() {
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
 
@@ -97,12 +98,12 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                 trees.get(6).waveletData.set(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4(
-                        trees.get(8).waveletData.get(i), 
+                        trees.get(7).waveletData.get(i), 
                         trees.get(2).waveletData.get(i),
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(i, pm1.get(0));
+                trees.get(7).waveletData.set(i, pm1.get(0));
                 trees.get(2).waveletData.set(i, pm1.get(1));
                 trees.get(4).waveletData.set(i, pm1.get(2));
                 trees.get(1).waveletData.set(i, pm1.get(3));
@@ -111,7 +112,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         }
     }
 
-    private void addSubtractInv() {
+    void addSubtractInv() {
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
 
@@ -127,12 +128,12 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
                 trees.get(6).waveletData.set(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4inv(
-                        trees.get(8).waveletData.get(i), 
+                        trees.get(7).waveletData.get(i), 
                         trees.get(2).waveletData.get(i),
                         trees.get(4).waveletData.get(i),
                         trees.get(1).waveletData.get(i));
 
-                trees.get(8).waveletData.set(i, pm1.get(0));
+                trees.get(7).waveletData.set(i, pm1.get(0));
                 trees.get(2).waveletData.set(i, pm1.get(1));
                 trees.get(4).waveletData.set(i, pm1.get(2));
                 trees.get(1).waveletData.set(i, pm1.get(3));
@@ -141,7 +142,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         }
     }
 
-	private static ArrayList<double[][][]> pm4 (double[][][] a, double[][][] b,
+	static ArrayList<double[][][]> pm4 (double[][][] a, double[][][] b,
 			double[][][] c, double[][][] d) {
 		 double[][][] p = 	
 				ArrayMath.divide(
@@ -195,7 +196,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
 		return pm;
 	}
 
-	private static ArrayList<double[][][]> pm4inv (double[][][] a, double[][][] b,
+	static ArrayList<double[][][]> pm4inv (double[][][] a, double[][][] b,
 			double[][][] c, double[][][] d) {
         double[][][] p = 
 				ArrayMath.divide(

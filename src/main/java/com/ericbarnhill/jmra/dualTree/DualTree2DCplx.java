@@ -55,6 +55,7 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
     }
 
     public void dwt() {
+        setTrees();
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();
         }

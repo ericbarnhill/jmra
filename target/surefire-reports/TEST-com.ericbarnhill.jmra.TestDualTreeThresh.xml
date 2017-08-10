@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.ericbarnhill.jmra.TestDualTreeThresh" time="18.526" tests="4" errors="1" skipped="0" failures="0">
+<testsuite name="com.ericbarnhill.jmra.TestDualTreeThresh" time="133.377" tests="4" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64"/>
@@ -58,15 +58,8 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="MRA2DTUTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.089"/>
-  <testcase name="DualTree2DTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.803"/>
-  <testcase name="DualTree3DTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="17.552">
-    <error message="8192" type="java.lang.ArrayIndexOutOfBoundsException">java.lang.ArrayIndexOutOfBoundsException: 8192
-	at com.ericbarnhill.jmra.TestDualTreeThresh.DualTree3DTest(TestDualTreeThresh.java:210)
-</error>
-    <system-out><![CDATA[Thresh DT3D
-Decomposition completed
-]]></system-out>
-  </testcase>
-  <testcase name="MRA2DTTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.082"/>
+  <testcase name="MRA2DTUTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.091"/>
+  <testcase name="DualTree2DTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.896"/>
+  <testcase name="DualTree3DTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="132.3"/>
+  <testcase name="MRA2DTTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.09"/>
 </testsuite>

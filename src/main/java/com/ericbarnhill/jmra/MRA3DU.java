@@ -60,10 +60,6 @@ public class MRA3DU extends MRA3D {
         return y;
     }
 
-    public void accept(Threshold threshold) {
-        threshold.visit(this);
-    }
-
     @Override
     public double[][][] getFilteredData() {
         return waveletData.get(0);

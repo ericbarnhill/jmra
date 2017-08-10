@@ -13,8 +13,8 @@ public abstract class MRA<N, B, V> {
     // N is ND array of numeric type
     // B is ND boolean array
     // V is 1D vector array of numeric type
-     N origData;
-     B maskData;
+     public N origData;
+     public B maskData;
      public ArrayList<N> waveletData; // sometimes manipulated and put back
      public int decompLvls; // also used for stride
      public int dimLvls;
@@ -105,10 +105,6 @@ public abstract class MRA<N, B, V> {
     abstract public N SFB(N lo, N hi, V sfl, V sfh, int decompLvl); 
 
     abstract public void accept(Threshold threshold);
-
-    public N getOriginalData() {
-        return origData;
-    }
 
     abstract public N getFilteredData();
 

@@ -4,8 +4,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.*;
 import com.ericbarnhill.arrayMath.ArrayMath;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
+import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
 import org.apache.commons.math4.stat.descriptive.moment.Mean;
 import org.apache.commons.numbers.complex.Complex;
@@ -150,8 +152,6 @@ public class Threshold {
                 }
             }
         }
-        //DEBUGGING
-        System.out.println("visit over");
     }
 
     public void visit(DualTree3DCplx dt3d) {
@@ -172,6 +172,30 @@ public class Threshold {
         }
     }
 
+    public void visitSerial(DualTree3DCplxSerial dt3d) {
+        if (dt3d.undecimated) {
+            final int sz = dt3d.trees.size();
+            final int decompSz = dt3d.trees.get(0).stride * dt3d.trees.get(0).decompLvls; 
+            for (int i = 0; i < sz; i += 2) {
+                for (int j = 0; j < decompSz; j++) {
+                    File reFile = dt3d.trees.get(i).waveletTempFiles.get(j);
+                    File imFile = dt3d.trees.get(i+1).waveletTempFiles.get(j);
+                    double[][][] dataR = Serializer.loadData(reFile);
+                    double[][][] dataI = Serializer.loadData(imFile);
+                    final int w = dataR.length;
+                    final int h = dataR[0].length;
+                    Complex[] complexTreeVec = ArrayMath.vectorize(ComplexUtils.split2Complex(dataR, dataI));
+                    boolean[] maskVec = ArrayMath.vectorize(dt3d.trees.get(i).maskData); // assume both masks are the same
+                    complexTreeVec = threshold(complexTreeVec, maskVec);
+                    dataR = ArrayMath.devectorize(ComplexUtils.complex2Real(complexTreeVec), w, h);
+                    dataI = ArrayMath.devectorize(ComplexUtils.complex2Imaginary(complexTreeVec), w, h);
+                    Serializer.writeData(dataR, reFile);
+                    Serializer.writeData(dataI, imFile);
+                }
+            }
+        }
+    }
+
     public  double[] threshold(double[] data, boolean[] mask) {
         double sigma = estimateSigma(data, mask);
         double[] thresholdedPixels = applyThresh(data, sigma);
@@ -181,6 +205,9 @@ public class Threshold {
     // estimate the noise using the real component of the tree
     public Complex[] threshold(Complex[] data, boolean[] mask) {
         double sigma = estimateSigma(ComplexUtils.complex2Real(data), mask);
+        // DEBUGGING +
+        System.out.println("sigma : " + sigma);
+        // DEBUGGING -
         Complex[] thresholdedPixels = applyThresh(data, sigma);
         return thresholdedPixels;
     }
@@ -221,7 +248,10 @@ public class Threshold {
                     }
                     break;
                 case SOFT:
+                    // DEBUGGING +
                     if (data[i].abs() > sigma) {
+                    //if (false) {
+                    // DEBUGGING -
                         double magnitude = (data[i].abs()- sigma);
                         threshedImage[i] = data[i].multiply(magnitude / (magnitude + sigma));
                      }
@@ -306,6 +336,11 @@ public class Threshold {
     }
 
     private  double noiseEst(double[] pixels) {
+        // DEBUGGING +
+        System.out.println("Min: " + new Min().evaluate(ArrayMath.abs(pixels)));
+        System.out.println("Max: " + new Max().evaluate(ArrayMath.abs(pixels)));
+        System.out.println("Mean: " + new Mean().evaluate(ArrayMath.abs(pixels)));
+        System.out.println("Median: " + new Median().evaluate(ArrayMath.abs(pixels)));
         return new Median().evaluate(ArrayMath.abs(pixels))/0.6745;
     }
 
@@ -317,7 +352,7 @@ public class Threshold {
         double[] maskedPixels = new double[numTrue];
         int maskedPixelsIndex = 0;
         for (int i = 0; i < data.length; i++) {
-            if (mask[i]) {
+            if (i < mask.length && mask[i]) {
                 maskedPixels[maskedPixelsIndex++] = data[i];
             }
         }
