@@ -8,16 +8,20 @@ import com.ericbarnhill.jmra.filters.*;
 
 public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double[]> {
 
-
     int stride;
 
     public DualTree3DCplx(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
         super(origData, maskData, fb, decompLvls, convType, undecimated);
         this.stride = 8;
+        origData = ArrayMath.divide(origData, Math.sqrt(8));
     }
 
     public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
         this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), fb, decompLvls, convType, undecimated);
+    }
+
+    public DualTree3DCplx(double[][][] origData) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), Wavelets.getFarrasKingsbury(), 3, ConvolverFactory.ConvolutionType.FDCPU, true);
     }
 
     @Override
@@ -55,7 +59,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
         return bankSum;
     }
 
-    public void dwt() {
+    public void dwt() { 
         setTrees();
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();

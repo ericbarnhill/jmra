@@ -206,7 +206,7 @@ public class Threshold {
     public Complex[] threshold(Complex[] data, boolean[] mask) {
         double sigma = estimateSigma(ComplexUtils.complex2Real(data), mask);
         // DEBUGGING +
-        System.out.println("sigma : " + sigma);
+        // System.out.println("sigma : " + sigma);
         // DEBUGGING -
         Complex[] thresholdedPixels = applyThresh(data, sigma);
         return thresholdedPixels;
@@ -337,10 +337,11 @@ public class Threshold {
 
     private  double noiseEst(double[] pixels) {
         // DEBUGGING +
-        System.out.println("Min: " + new Min().evaluate(ArrayMath.abs(pixels)));
-        System.out.println("Max: " + new Max().evaluate(ArrayMath.abs(pixels)));
-        System.out.println("Mean: " + new Mean().evaluate(ArrayMath.abs(pixels)));
-        System.out.println("Median: " + new Median().evaluate(ArrayMath.abs(pixels)));
+        // System.out.println("Min: " + new Min().evaluate(ArrayMath.abs(pixels)));
+        // System.out.println("Max: " + new Max().evaluate(ArrayMath.abs(pixels)));
+        // System.out.println("Mean: " + new Mean().evaluate(ArrayMath.abs(pixels)));
+        // System.out.println("Median: " + new Median().evaluate(ArrayMath.abs(pixels)));
+        // DEBUGGING -
         return new Median().evaluate(ArrayMath.abs(pixels))/0.6745;
     }
 
