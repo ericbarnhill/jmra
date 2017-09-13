@@ -74,7 +74,7 @@ public class TestMRAUNoThresh{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
     }
 }
 

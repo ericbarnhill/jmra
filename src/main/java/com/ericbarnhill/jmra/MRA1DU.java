@@ -12,14 +12,14 @@ public class MRA1DU extends MRA1D {
      }
 
      @Override
-     public double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] analysis(double[] y, double[] filter, int decompLvl) {
         double[] filterATrous = ArrayMath.divide(aTrous(filter, decompLvl), Math.sqrt(2));
         y = upFirDn.upFirDn(y,filterATrous, 1, 1);
         return y;
      }
 
      @Override
-     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] synthesis(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         double[] sflATrous = ArrayMath.divide(aTrous(sfl, decompLvl), Math.sqrt(2));
         double[] sfhATrous = ArrayMath.divide(aTrous(sfh, decompLvl), Math.sqrt(2));
         int M = (int)Math.pow(2, decompLvl);
@@ -45,6 +45,6 @@ public class MRA1DU extends MRA1D {
 
     @Override
     public double[] getFilteredData() {
-        return waveletData.get(0);
+        return getData(0);
     }
 }

@@ -16,7 +16,7 @@ public class Serializer {
         return data;
     }
 
-    public static void writeData(double[][][] data, File file) {
+    public static void writeData(File file, double[][][] data) {
         try {
             FileOutputStream fileStream = new FileOutputStream(file);
             ObjectOutputStream objectStream = new ObjectOutputStream(fileStream);

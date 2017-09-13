@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestMRANoThresh
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.404 sec - in com.ericbarnhill.jmra.TestMRANoThresh
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.319 sec - in com.ericbarnhill.jmra.TestMRANoThresh

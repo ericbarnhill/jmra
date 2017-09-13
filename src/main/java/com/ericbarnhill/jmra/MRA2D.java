@@ -89,8 +89,8 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
                 x = ArrayMath.shiftDim(x);
                 break;
         }
-        double[][] lo = AFB(x, fb.af.lo, decompLvl);
-        double[][] hi = AFB(x, fb.af.hi, decompLvl);
+        double[][] lo = analysis(x, fb.af.lo, decompLvl);
+        double[][] hi = analysis(x, fb.af.hi, decompLvl);
         switch(localStride) {
             case 2:
                 lo = ArrayMath.shiftDim(lo);
@@ -113,7 +113,7 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
                 hi = ArrayMath.shiftDim(hi);
                 break;
         }
-        double[][] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
+        double[][] y = synthesis(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
         switch (localStride) {
             case 2:
                 y = ArrayMath.shiftDim(y);
@@ -123,29 +123,37 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     @Override
-    public double[][] AFB(double[][] data, double[] filter, int decompLvl) { 
+    public double[][] analysis(double[][] data, double[] filter, int decompLvl) { 
       final int fi = data.length;
       final int fj = data[0].length;
       double[][] filtData = new double[fi][];
       for (int i = 0; i < fi; i++) {
-              filtData[i] = mra1d.AFB(data[i], filter, decompLvl);
+              filtData[i] = mra1d.analysis(data[i], filter, decompLvl);
       }
       return filtData;
     }
 
 
     @Override
-    public double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompLvl) {
+    public double[][] synthesis(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int fi = lo.length;
         double[][] y = new double[fi][];
         for (int i = 0; i < fi; i++) {
-            y[i] = mra1d.SFB(lo[i], hi[i], sfl, sfh, decompLvl);
+            y[i] = mra1d.synthesis(lo[i], hi[i], sfl, sfh, decompLvl);
         }
         return y;
     }
 
     public void accept(Threshold threshold) {
         threshold.visit(this);
+    }
+
+    public double[][] getData(int index) {
+        return waveletData.get(index);
+    }
+
+    public void setData(int index, double[][] data) {
+        waveletData.set(index, data);
     }
 
     @Override

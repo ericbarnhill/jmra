@@ -5,12 +5,6 @@ import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.filters.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import ij.io.Opener;
-import ij.io.FileSaver;
-import ij.ImagePlus;
-import ij.ImageStack;
-import ij.process.ImageProcessor;
-import ij.process.FloatProcessor;
 
 public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
 
@@ -89,10 +83,10 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
             if (decompLvl == 0) {
                 x = ArrayMath.deepCopy(paddedData);
             } else {
-                x = waveletData.get(localIndex - stride);
+                x = getData(localIndex - stride);
             }
         } else {
-            x = waveletData.get(ind);
+            x = getData(ind);
         }
         switch(localStride) {
             case 4: 
@@ -102,8 +96,8 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
                 x = ArrayMath.shiftDim(x, 2);
                 break;
         }
-        double[][][] lo = AFB(x, fb.af.lo, decompLvl);
-        double[][][] hi = AFB(x, fb.af.hi, decompLvl);
+        double[][][] lo = analysis(x, fb.af.lo, decompLvl);
+        double[][][] hi = analysis(x, fb.af.hi, decompLvl);
         switch(localStride) {
             case 4: 
                 lo = ArrayMath.shiftDim(lo, 2);
@@ -122,8 +116,8 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
 
     @Override
     public double[][][] getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride) {
-        double[][][] lo = waveletData.get(ind);
-        double[][][] hi = waveletData.get(ind + localPair);
+        double[][][] lo = getData(ind);
+        double[][][] hi = getData(ind + localPair);
         switch (localStride) {
             case 4: 
                 lo = ArrayMath.shiftDim(lo, 1);
@@ -134,7 +128,7 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
                 hi = ArrayMath.shiftDim(hi, 2);
                 break;
         }
-        double[][][] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
+        double[][][] y = synthesis(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
         switch (localStride) {
             case 4: 
                 y = ArrayMath.shiftDim(y, 2);
@@ -147,7 +141,7 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
     }
     
     @Override
-    public double[][][] AFB(double[][][] data, double[] filter, int decompLvl) {
+    public double[][][] analysis(double[][][] data, double[] filter, int decompLvl) {
         final int fi = data.length;
         final int fj = data[0].length;
         final int fk = data[0][0].length;
@@ -155,55 +149,41 @@ public class MRA3D extends MRA<double[][][], boolean[][][], double[]> {
         double[][][] filtData = new double[fi][fj][];
         for (int i = 0; i < fi; i++) { 
             for (int j = 0; j < fj; j++) {
-                filtData[i][j] = mra1d.AFB(data[i][j], filter, decompLvl); 
+                filtData[i][j] = mra1d.analysis(data[i][j], filter, decompLvl); 
             } 
         }
         return filtData;
     } 
 
     @Override
-    public double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
+    public double[][][] synthesis(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int fi = lo.length;
         final int fj = lo[0].length;
         final int fk = lo[0][0].length*2;
         double[][][] y = new double[fi][fj][];
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
-                y[i][j] = mra1d.SFB(lo[i][j], hi[i][j], sfl, sfh, decompLvl);
+                y[i][j] = mra1d.synthesis(lo[i][j], hi[i][j], sfl, sfh, decompLvl);
             }
         }
         return y;
     }
 
+    public double[][][] getData(int index) {
+        return waveletData.get(index);
+    }
+
+    public void setData(int index, double[][][] data) {
+        waveletData.set(index, data);
+    }
 
     public void accept(Threshold threshold) {
         threshold.visit(this);
     }
 
-   
-    // for debugging and testing
-    public void data2File(double[][][] data, String path) {
-        int w = data.length;
-        int h = data[0].length;
-        int d = data[0][0].length;
-        ImageStack is = new ImageStack(w,h);
-        for (int k = 0; k < d; k++) {
-            FloatProcessor fp = new FloatProcessor(w,h);
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
-                            fp.putPixelValue(i,j,data[i][j][k]);
-                }
-            }
-            is.addSlice(fp);
-        }
-        ImagePlus ip = new ImagePlus("", is);
-        FileSaver fs = new FileSaver(ip);
-        fs.saveAsTiff(path);
-    }
-
     @Override
     public double[][][] getFilteredData() {
-        return ArrayMath.stripBorderPadding(waveletData.get(0), (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
+        return ArrayMath.stripBorderPadding(getData(0), (wPad-w)/2, (hPad-h)/2, (dPad-d)/2);
     }
 
 }

@@ -33,10 +33,10 @@ public class MRA2DDT extends MRA2D {
             if (decompLvl == 0) {
                 x = ArrayMath.deepCopy(paddedData);
             } else {
-                x = waveletData.get(localIndex - stride);
+                x = getData(localIndex - stride);
             }
         } else {
-            x = waveletData.get(ind);
+            x = getData(ind);
         }
         // decompose into lo and hi
         double[][] lo = new double[0][];
@@ -44,21 +44,21 @@ public class MRA2DDT extends MRA2D {
         switch(localStride) { // shift dim for y processing. done as a switch block so higher dim code can all use the identical form
             case 4:
                 if (decompLvl == 0) {
-                    lo = AFB(x, fb.faf.get(0).lo, decompLvl);
-                    hi = AFB(x, fb.faf.get(0).hi, decompLvl);
+                    lo = analysis(x, fb.faf.get(0).lo, decompLvl);
+                    hi = analysis(x, fb.faf.get(0).hi, decompLvl);
                 } else {
-                    lo = AFB(x, fb.af.get(0).lo, decompLvl);
-                    hi = AFB(x, fb.af.get(0).hi, decompLvl);
+                    lo = analysis(x, fb.af.get(0).lo, decompLvl);
+                    hi = analysis(x, fb.af.get(0).hi, decompLvl);
                 }    
                 break;
             case 2:
                 x = ArrayMath.shiftDim(x);
                 if (decompLvl == 0) {
-                    lo = AFB(x, fb.faf.get(1).lo, decompLvl);
-                    hi = AFB(x, fb.faf.get(1).hi, decompLvl);
+                    lo = analysis(x, fb.faf.get(1).lo, decompLvl);
+                    hi = analysis(x, fb.faf.get(1).hi, decompLvl);
                 } else {
-                    lo = AFB(x, fb.af.get(1).lo, decompLvl);
-                    hi = AFB(x, fb.af.get(1).hi, decompLvl);
+                    lo = analysis(x, fb.af.get(1).lo, decompLvl);
+                    hi = analysis(x, fb.af.get(1).hi, decompLvl);
                 }    
                 lo = ArrayMath.shiftDim(lo);
                 hi = ArrayMath.shiftDim(hi);
@@ -72,24 +72,24 @@ public class MRA2DDT extends MRA2D {
 
     @Override
     public double[][] getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride) {
-        double[][] lo = waveletData.get(ind);
-        double[][] hi = waveletData.get(ind + localPair);
+        double[][] lo = getData(ind);
+        double[][] hi = getData(ind + localPair);
         double[][] y = new double[0][]; 
         switch (localStride) {
             case 4:
                 if (decompLvl == 0) {
-                    y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
+                    y = synthesis(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
                 } else {
-                    y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
+                    y = synthesis(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
                 }
                 break;
             case 2:
                 lo = ArrayMath.shiftDim(lo);
                 hi = ArrayMath.shiftDim(hi);
                 if (decompLvl == 0) {
-                    y = SFB(lo, hi, fb.fsf.get(1).lo, fb.fsf.get(1).hi, decompLvl);
+                    y = synthesis(lo, hi, fb.fsf.get(1).lo, fb.fsf.get(1).hi, decompLvl);
                 } else {
-                    y = SFB(lo, hi, fb.sf.get(1).lo, fb.sf.get(1).hi, decompLvl);
+                    y = synthesis(lo, hi, fb.sf.get(1).lo, fb.sf.get(1).hi, decompLvl);
                 }
                 y = ArrayMath.shiftDim(y);
                 break;

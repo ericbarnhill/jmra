@@ -33,34 +33,35 @@ public class MRA3DU extends MRA3D {
     }
 
     @Override
-    public double[][][] AFB(double[][][] data, double[] filter, int decompositionLevel) {
+    public double[][][] analysis(double[][][] data, double[] filter, int decompositionLevel) {
         final int fi = data.length;
         final int fj = data[0].length;
         double[][][] filtData = new double[fi][fj][];
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
-                filtData[i][j] = mra1du.AFB(data[i][j], filter, decompositionLevel);
-                //filtData[i][j] = mra1d.AFB(data[i][j], filter, decompositionLevel);
+                filtData[i][j] = mra1du.analysis(data[i][j], filter, decompositionLevel);
+                //filtData[i][j] = mra1d.analysis(data[i][j], filter, decompositionLevel);
             }
         }
         return filtData;
     }
     
     @Override
-    public double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
+    public double[][][] synthesis(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
         final int fi = lo.length;
         final int fj = lo[0].length;
         double[][][] y = new double[fi][fj][];
         for (int i = 0; i < fi; i++) {
             for (int j = 0; j < fj; j++) { 
-                y[i][j] = mra1du.SFB(lo[i][j], hi[i][j], sfl, sfh, decompositionLevel);
-                //y[i][j] = mra1d.SFB(lo[i][j], hi[i][j], sfl, sfh, decompositionLevel);
+                y[i][j] = mra1du.synthesis(lo[i][j], hi[i][j], sfl, sfh, decompositionLevel);
+                //y[i][j] = mra1d.synthesis(lo[i][j], hi[i][j], sfl, sfh, decompositionLevel);
             }
         }
         return y;
     }
 
     @Override
+    // need to override so data is not cropped
     public double[][][] getFilteredData() {
         return waveletData.get(0);
     }

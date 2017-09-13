@@ -26,13 +26,13 @@ public class MRA1DDTU extends MRA1DDT {
     }
 
     @Override
-    public double[] AFB(double[] x, double[] filter, int decompLvl) {
-        return mra1du.AFB(x, filter, decompLvl);
+    public double[] analysis(double[] x, double[] filter, int decompLvl) {
+        return mra1du.analysis(x, filter, decompLvl);
     }
 
     @Override
-    public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
-        return mra1du.SFB(lo, hi, sfl, sfh, decompLvl);
+    public double[] synthesis(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+        return mra1du.synthesis(lo, hi, sfl, sfh, decompLvl);
     }
 
 }

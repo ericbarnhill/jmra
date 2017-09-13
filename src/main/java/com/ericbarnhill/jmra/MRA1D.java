@@ -52,13 +52,13 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
             if (decompLvl == 0) {
                 x = ArrayMath.deepCopy(paddedData);
             } else {
-                x = waveletData.get(localIndex - stride);
+                x = getData(localIndex - stride);
             }
         } else {
-            x = waveletData.get(ind);
+            x = getData(ind);
         }
-        double[] lo = AFB(x, fb.af.lo, decompLvl);
-        double[] hi = AFB(x, fb.af.hi, decompLvl);
+        double[] lo = analysis(x, fb.af.lo, decompLvl);
+        double[] hi = analysis(x, fb.af.hi, decompLvl);
         ArrayList<double[]> loAndHi = new ArrayList<double[]>();
         loAndHi.add(lo);
         loAndHi.add(hi);
@@ -67,9 +67,9 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
 
     @Override
     public double[] getRecomposition(int localPair, int ind, int decompLevel, int decompLvl, int dimLvl) {
-        double[] lo = waveletData.get(ind);
-        double[] hi = waveletData.get(ind + localPair);
-        double[] y = SFB(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
+        double[] lo = getData(ind);
+        double[] hi = getData(ind + localPair);
+        double[] y = synthesis(lo, hi, fb.sf.lo, fb.sf.hi, decompLvl);
         return y;
     }
 
@@ -79,7 +79,7 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
     }
 
     @Override
-     public double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] analysis(double[] y, double[] filter, int decompLvl) {
         final int N = y.length/2;
         final int L = filter.length;
         y = Shifter.circShift(y, -L/2);
@@ -92,7 +92,7 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
     }
 
     @Override
-     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] synthesis(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int N = 2*lo.length;
         final int L0 = sfl.length;
         lo = upFirDn.upFirDn(lo, sfl, 2, 1);
@@ -105,6 +105,17 @@ public class MRA1D extends MRA<double[], boolean[], double[]> {
         y = Shifter.circShift(y, 1-L0/2);
         return y;
      }
+
+    @Override
+    public double[] getData(int index) {
+        double[] data = waveletData.get(index);
+        return data;
+    }
+
+    @Override
+    public void setData(int index, double[] data) {
+        waveletData.set(index, data);
+    }
 
     @Override
     public double[] getFilteredData() {

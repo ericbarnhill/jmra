@@ -54,7 +54,7 @@ public class TestMRANoThresh{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d.tif");
     }
 }
 

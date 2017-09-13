@@ -79,7 +79,7 @@ public class TestDualTreeNoThresh{
         ArrayList<double[][][]> decomp = mra.getDecomposition();
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_dt.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_dt.tif");
     }
     @Test
     public void DualTree3DSerialTest() {
@@ -96,13 +96,13 @@ public class TestDualTreeNoThresh{
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
-        DualTree3DCplxSerial dt = new DualTree3DCplxSerial(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, false);
+        DualTree3DCplxSerial dt = new DualTree3DCplxSerial(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, true);
         dt.dwt();
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         dt.idwt();
         image = dt.getFilteredData();
         String resultFile = FilePaths.root + "dualtree3d_serial_filt.tif";
-        new MRA3D().data2File(image, resultFile);
+        FilePaths.data2File(image, resultFile);
         long t2 = System.currentTimeMillis();
         System.out.println("Time serialized " + ((t2-t1)/1000) + " sec");
     }

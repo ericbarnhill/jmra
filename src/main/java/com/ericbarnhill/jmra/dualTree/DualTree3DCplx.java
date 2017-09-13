@@ -89,28 +89,27 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
     void addSubtractFwd() {
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
-
                 ArrayList<double[][][]> pm1 = pm4(
-                        trees.get(0).waveletData.get(i), 
-                        trees.get(5).waveletData.get(i),
-                        trees.get(3).waveletData.get(i),
-                        trees.get(6).waveletData.get(i));
+                        trees.get(0).getData(i), 
+                        trees.get(5).getData(i),
+                        trees.get(3).getData(i),
+                        trees.get(6).getData(i));
 
-                trees.get(0).waveletData.set(i, pm1.get(0));
-                trees.get(5).waveletData.set(i, pm1.get(1));
-                trees.get(3).waveletData.set(i, pm1.get(2));
-                trees.get(6).waveletData.set(i, pm1.get(3));
+                trees.get(0).setData(i, pm1.get(0));
+                trees.get(5).setData(i, pm1.get(1));
+                trees.get(3).setData(i, pm1.get(2));
+                trees.get(6).setData(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4(
-                        trees.get(7).waveletData.get(i), 
-                        trees.get(2).waveletData.get(i),
-                        trees.get(4).waveletData.get(i),
-                        trees.get(1).waveletData.get(i));
+                        trees.get(7).getData(i), 
+                        trees.get(2).getData(i),
+                        trees.get(4).getData(i),
+                        trees.get(1).getData(i));
 
-                trees.get(7).waveletData.set(i, pm1.get(0));
-                trees.get(2).waveletData.set(i, pm1.get(1));
-                trees.get(4).waveletData.set(i, pm1.get(2));
-                trees.get(1).waveletData.set(i, pm1.get(3));
+                trees.get(7).setData(i, pm1.get(0));
+                trees.get(2).setData(i, pm1.get(1));
+                trees.get(4).setData(i, pm1.get(2));
+                trees.get(1).setData(i, pm1.get(3));
 
             }
         }
@@ -121,26 +120,26 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
             if (i % stride != 0) { // skip low pass images
 
                 ArrayList<double[][][]> pm1 = pm4inv(
-                        trees.get(0).waveletData.get(i), 
-                        trees.get(5).waveletData.get(i),
-                        trees.get(3).waveletData.get(i),
-                        trees.get(6).waveletData.get(i));
+                        trees.get(0).getData(i), 
+                        trees.get(5).getData(i),
+                        trees.get(3).getData(i),
+                        trees.get(6).getData(i));
 
-                trees.get(0).waveletData.set(i, pm1.get(0));
-                trees.get(5).waveletData.set(i, pm1.get(1));
-                trees.get(3).waveletData.set(i, pm1.get(2));
-                trees.get(6).waveletData.set(i, pm1.get(3));
+                trees.get(0).setData(i, pm1.get(0));
+                trees.get(5).setData(i, pm1.get(1));
+                trees.get(3).setData(i, pm1.get(2));
+                trees.get(6).setData(i, pm1.get(3));
 
                 ArrayList<double[][][]> pm2 = pm4inv(
-                        trees.get(7).waveletData.get(i), 
-                        trees.get(2).waveletData.get(i),
-                        trees.get(4).waveletData.get(i),
-                        trees.get(1).waveletData.get(i));
+                        trees.get(7).getData(i), 
+                        trees.get(2).getData(i),
+                        trees.get(4).getData(i),
+                        trees.get(1).getData(i));
 
-                trees.get(7).waveletData.set(i, pm1.get(0));
-                trees.get(2).waveletData.set(i, pm1.get(1));
-                trees.get(4).waveletData.set(i, pm1.get(2));
-                trees.get(1).waveletData.set(i, pm1.get(3));
+                trees.get(7).setData(i, pm1.get(0));
+                trees.get(2).setData(i, pm1.get(1));
+                trees.get(4).setData(i, pm1.get(2));
+                trees.get(1).setData(i, pm1.get(3));
 
             }
         }

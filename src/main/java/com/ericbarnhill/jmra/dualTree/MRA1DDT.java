@@ -40,19 +40,19 @@ public class MRA1DDT extends MRA1D {
             if (decompLvl == 0) {
                 x = ArrayMath.deepCopy(paddedData);
             } else {
-                x = waveletData.get(localIndex - stride);
+                x = getData(localIndex - stride);
             }
         } else {
-            x = waveletData.get(ind);
+            x = getData(ind);
         }
         double[] lo = new double[0];
         double[] hi = new double[0];
         if (decompLvl == 0) {
-            lo = AFB(x, fb.faf.get(0).lo, decompLvl);
-            hi = AFB(x, fb.faf.get(0).hi, decompLvl);
+            lo = analysis(x, fb.faf.get(0).lo, decompLvl);
+            hi = analysis(x, fb.faf.get(0).hi, decompLvl);
         } else {
-            lo = AFB(x, fb.af.get(0).lo, decompLvl);
-            hi = AFB(x, fb.af.get(0).hi, decompLvl);
+            lo = analysis(x, fb.af.get(0).lo, decompLvl);
+            hi = analysis(x, fb.af.get(0).hi, decompLvl);
         }    
         ArrayList<double[]> loAndHi = new ArrayList<double[]>();
         loAndHi.add(lo);
@@ -62,13 +62,13 @@ public class MRA1DDT extends MRA1D {
 
     @Override
     public double[] getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride) {
-        double[] lo = waveletData.get(ind);
-        double[] hi = waveletData.get(ind + localPair);
+        double[] lo = getData(ind);
+        double[] hi = getData(ind + localPair);
         double[] y  = new double[0];
         if (decompLvl == 0) {
-            y = SFB(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
+            y = synthesis(lo, hi, fb.fsf.get(0).lo, fb.fsf.get(0).hi, decompLvl);
         } else {
-            y = SFB(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
+            y = synthesis(lo, hi, fb.sf.get(0).lo, fb.sf.get(0).hi, decompLvl);
         }
         return y;
     }
@@ -79,7 +79,7 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-     public double[] AFB(double[] y, double[] filter, int decompLvl) {
+     public double[] analysis(double[] y, double[] filter, int decompLvl) {
         final int N = y.length/2;
         final int L = filter.length;
         y = Shifter.circShift(y, -L/2);
@@ -92,7 +92,7 @@ public class MRA1DDT extends MRA1D {
     }
 
     @Override
-     public double[] SFB(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
+     public double[] synthesis(double[] lo, double[] hi, double[] sfl, double[] sfh, int decompLvl) {
         final int N = 2*lo.length;
         final int L0 = sfl.length;
         lo = upFirDn.upFirDn(lo, sfl, 2, 1);

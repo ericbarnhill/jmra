@@ -15,7 +15,7 @@ public abstract class MRA<N, B, V> {
     // V is 1D vector array of numeric type
      public N origData;
      public B maskData;
-     public ArrayList<N> waveletData; // sometimes manipulated and put back
+     public ArrayList<N> waveletData;
      public int decompLvls; // also used for stride
      public int dimLvls;
      public int stride;
@@ -72,8 +72,8 @@ public abstract class MRA<N, B, V> {
             ArrayList<N> loAndHi = getDecomposition(localIndex, ind, decompLvl, dimLvl, localStride);
             N lo = loAndHi.get(0);
             N hi = loAndHi.get(1);
-            waveletData.set(ind, lo);
-            waveletData.set(ind + localPair, hi);
+            setData(ind, lo);
+            setData(ind + localPair, hi);
         }
         if (dimLvl < dimLvls - 1) {
             decompose(decompLvl, dimLvl+1);
@@ -88,7 +88,7 @@ public abstract class MRA<N, B, V> {
         int localIndex = stride*decompLvl;
         for (int ind = localIndex; ind < localIndex+stride; ind += localStride) { 
             N y = getRecomposition(localPair, ind, decompLvl, dimLvl, localStride);
-            waveletData.set(ind, y);
+            setData(ind, y);
         }
         if (dimLvl > 0) {
             recompose(decompLvl, dimLvl-1);
@@ -100,9 +100,13 @@ public abstract class MRA<N, B, V> {
 
     abstract public N getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride);
 
-    abstract public N AFB(N y, V filter, int decompLvl);
+    abstract public N analysis(N y, V filter, int decompLvl);
 
-    abstract public N SFB(N lo, N hi, V sfl, V sfh, int decompLvl); 
+    abstract public N synthesis(N lo, N hi, V sfl, V sfh, int decompLvl); 
+
+    abstract public N getData(int index);
+
+    abstract public void setData(int index, N data);
 
     abstract public void accept(Threshold threshold);
 

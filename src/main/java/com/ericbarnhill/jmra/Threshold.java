@@ -178,10 +178,8 @@ public class Threshold {
             final int decompSz = dt3d.trees.get(0).stride * dt3d.trees.get(0).decompLvls; 
             for (int i = 0; i < sz; i += 2) {
                 for (int j = 0; j < decompSz; j++) {
-                    File reFile = dt3d.trees.get(i).waveletTempFiles.get(j);
-                    File imFile = dt3d.trees.get(i+1).waveletTempFiles.get(j);
-                    double[][][] dataR = Serializer.loadData(reFile);
-                    double[][][] dataI = Serializer.loadData(imFile);
+                    double[][][] dataR = dt3d.trees.get(i).getData(j);
+                    double[][][] dataI  = dt3d.trees.get(i+1).getData(j);
                     final int w = dataR.length;
                     final int h = dataR[0].length;
                     Complex[] complexTreeVec = ArrayMath.vectorize(ComplexUtils.split2Complex(dataR, dataI));
@@ -189,8 +187,8 @@ public class Threshold {
                     complexTreeVec = threshold(complexTreeVec, maskVec);
                     dataR = ArrayMath.devectorize(ComplexUtils.complex2Real(complexTreeVec), w, h);
                     dataI = ArrayMath.devectorize(ComplexUtils.complex2Imaginary(complexTreeVec), w, h);
-                    Serializer.writeData(dataR, reFile);
-                    Serializer.writeData(dataI, imFile);
+                    dt3d.trees.get(i).setData(j, dataR);
+                    dt3d.trees.get(i+1).setData(j, dataR);
                 }
             }
         }

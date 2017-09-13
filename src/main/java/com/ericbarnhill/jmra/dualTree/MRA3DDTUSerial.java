@@ -26,18 +26,18 @@ public class MRA3DDTUSerial extends MRA3DDTSerial {
     }
 
     @Override
-    public double[][][] AFB(double[][][] x, double[] filter, int decompLvl) {
-        return mra3du.AFB(x, filter, decompLvl);
+    public double[][][] analysis(double[][][] x, double[] filter, int decompLvl) {
+        return mra3du.analysis(x, filter, decompLvl);
     }
 
     @Override
-    public double[][][] SFB(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
-        return mra3du.SFB(lo, hi, sfl, sfh, decompLvl);
+    public double[][][] synthesis(double[][][] lo, double[][][] hi, double[] sfl, double[] sfh, int decompLvl) {
+        return mra3du.synthesis(lo, hi, sfl, sfh, decompLvl);
     }
     
     @Override
     public double[][][] getFilteredData() {
-        return Serializer.loadData(waveletTempFiles.get(0));
+        return getData(0);
     }
 
 }

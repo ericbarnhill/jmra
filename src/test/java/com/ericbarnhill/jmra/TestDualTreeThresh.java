@@ -94,10 +94,10 @@ public class TestDualTreeThresh{
         ArrayList<double[][][]> decomp = mra.getDecomposition();
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
     }
 
-    @Test
+    @Ignore
     public void DualTree3DTest() {
         long t1 = System.currentTimeMillis();
         System.out.println("Dualtree 3D non serial with thresh");
@@ -120,7 +120,7 @@ public class TestDualTreeThresh{
         dt.idwt();
         image = dt.getFilteredData();
         String resultFile = FilePaths.root + "dualtree3d_nonserial_thresh.tif";
-        new MRA3D().data2File(image, resultFile);
+        FilePaths.data2File(image, resultFile);
         long t2 = System.currentTimeMillis();
         System.out.println("Time unserialized " + ((t2-t1)/1000) + " sec");
 

@@ -30,29 +30,29 @@ public class MRA2DU extends MRA2D {
     }
 
     @Override
-    public double[][] AFB(double[][] data, double[] filter, int decompositionLevel) {
+    public double[][] analysis(double[][] data, double[] filter, int decompositionLevel) {
         final int J = decompLvls - decompositionLevel;
         final int fi = data.length;
         final int fj = data[0].length;
         final int N = filter.length;
         double[][] filtData = new double[fi][];
         for (int i = 0; i < fi; i++) {
-            //filtData[i] = mra1du.AFB(data[i], filter, J);
-            filtData[i] = mra1d.AFB(data[i], filter, J);
+            //filtData[i] = mra1du.analysis(data[i], filter, J);
+            filtData[i] = mra1d.analysis(data[i], filter, J);
         }
         return filtData;
     }
 
     @Override
-    public double[][] SFB(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
+    public double[][] synthesis(double[][] lo, double[][] hi, double[] sfl, double[] sfh, int decompositionLevel) {
         final int J = decompLvls - decompositionLevel;
         final int N = sfl.length + sfh.length;
         final int fi = lo.length;
         final int fj = lo[0].length;
         double[][] y = new double[fi][];
         for (int i = 0; i < fi; i++) {
-            //y[i] = mra1du.SFB(lo[i], hi[i], sfl, sfh, J);
-            y[i] = mra1d.SFB(lo[i], hi[i], sfl, sfh, J);
+            //y[i] = mra1du.synthesis(lo[i], hi[i], sfl, sfh, J);
+            y[i] = mra1d.synthesis(lo[i], hi[i], sfl, sfh, J);
         }
         return y;
     }
@@ -60,25 +60,4 @@ public class MRA2DU extends MRA2D {
     public void accept(Threshold threshold) {
         threshold.visit(this);
     }
-
-    @Override
-    public double[][] getFilteredData() {
-        return waveletData.get(0);
-    }
-
-    // for debugging and testing
-    public void data2File(double[][] data, String path) {
-        int w = data.length;
-        int h = data[0].length;
-        FloatProcessor fp = new FloatProcessor(w,h);
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                fp.putPixelValue(i,j,data[i][j]);
-            }
-        }
-        ImagePlus ip = new ImagePlus("", fp);
-        FileSaver fs = new FileSaver(ip);
-        fs.saveAsTiff(path);
-    }
-
 }

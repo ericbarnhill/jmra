@@ -11,7 +11,7 @@ public class Visualizer {
                 double[][][] data = tree.waveletData.get(j);
                 String filename = FilePaths.root + "_" + Integer.toString(i) + "_" + 
                     Integer.toString(j) + ".tif";
-                new MRA3D().data2File(data, filename);
+                FilePaths.data2File(data, filename);
             }
         }
     }

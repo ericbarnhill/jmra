@@ -76,14 +76,14 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
     public void addSubtract(boolean fwd) {
         for (int i = 0; i < stride*decompLvls; i++) {
             if (i % stride != 0) { // skip low pass images
-                ArrayList<double[][]> pm1 = pm(trees.get(0).waveletData.get(i), 
-                        trees.get(3).waveletData.get(i));
-                trees.get(0).waveletData.set(i, pm1.get(0));
-                trees.get(3).waveletData.set(i, pm1.get(1));
-                ArrayList<double[][]> pm2 = pm(trees.get(1).waveletData.get(i), 
-                        trees.get(2).waveletData.get(i));
-                trees.get(1).waveletData.set(i, pm2.get(0));
-                trees.get(2).waveletData.set(i, pm2.get(1));
+                ArrayList<double[][]> pm1 = pm(trees.get(0).getData(i), 
+                        trees.get(3).getData(i));
+                trees.get(0).setData(i, pm1.get(0));
+                trees.get(3).setData(i, pm1.get(1));
+                ArrayList<double[][]> pm2 = pm(trees.get(1).getData(i), 
+                        trees.get(2).getData(i));
+                trees.get(1).setData(i, pm2.get(0));
+                trees.get(2).setData(i, pm2.get(1));
             }
         }
     }

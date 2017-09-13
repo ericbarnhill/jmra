@@ -40,7 +40,7 @@ public class Test3DSerial{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_serial.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_serial.tif");
     }
 
     @Test
@@ -63,7 +63,7 @@ public class Test3DSerial{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        mra.data2File(filteredData, FilePaths.root+"filtdata_3d_serial_u.tif");
+        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_serial_u.tif");
     }
 }
         

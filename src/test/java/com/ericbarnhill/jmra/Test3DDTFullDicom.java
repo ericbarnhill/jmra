@@ -44,15 +44,9 @@ public class Test3DDTFullDicom{
         //threshold.visitSerial(dt);
 
         dt.idwt();
-        /*
-        for (int n = 0; n < decomp.size(); n++) {
-            String path = "/home/ericbarnhill/Documents/code/" + Integer.toString(n)+ "_after.tif";
-            array2Image(decomp.get(n), path);
-        }
-        */
         image = dt.getFilteredData();
         String resultFile = FilePaths.root + "dualtree3d_fulldicom.tif";
-        new MRA3D().data2File(image, resultFile);
+        FilePaths.data2File(image, resultFile);
         long t2 = System.currentTimeMillis();
         System.out.println("Time for fullsize dicom processing:  " + ((t2-t1)/1000) + " sec");
 

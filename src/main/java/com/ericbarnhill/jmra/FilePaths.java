@@ -3,6 +3,7 @@ package com.ericbarnhill.jmra;
 import ij.io.Opener;
 import ij.io.FileSaver;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
 
@@ -40,6 +41,26 @@ public class FilePaths {
             }
         }
         ImagePlus ip = new ImagePlus("", fp);
+        FileSaver fs = new FileSaver(ip);
+        fs.saveAsTiff(path);
+    }
+
+    // for debugging and testing
+    static public void data2File(double[][][] data, String path) {
+        int w = data.length;
+        int h = data[0].length;
+        int d = data[0][0].length;
+        ImageStack is = new ImageStack(w,h);
+        for (int k = 0; k < d; k++) {
+            FloatProcessor fp = new FloatProcessor(w,h);
+            for (int i = 0; i < w; i++) {
+                for (int j = 0; j < h; j++) {
+                            fp.putPixelValue(i,j,data[i][j][k]);
+                }
+            }
+            is.addSlice(fp);
+        }
+        ImagePlus ip = new ImagePlus("", is);
         FileSaver fs = new FileSaver(ip);
         fs.saveAsTiff(path);
     }
