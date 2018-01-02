@@ -16,6 +16,7 @@
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA3D.java
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/dualTree/MRA3DDTUSerial.java
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/filters/FilterPair.java
+/home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/NDData.java
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/Threshold.java
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/Shifter.java
 /home/ericbarnhill/Documents/code/jmra/src/main/java/com/ericbarnhill/jmra/MRA3DUSerial.java
