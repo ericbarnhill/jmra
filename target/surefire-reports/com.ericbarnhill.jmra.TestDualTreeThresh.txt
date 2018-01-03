@@ -1,4 +1,18 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestDualTreeThresh
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.012 sec - in com.ericbarnhill.jmra.TestDualTreeThresh
+Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.149 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestDualTreeThresh
+MRA2DTUTest(com.ericbarnhill.jmra.TestDualTreeThresh)  Time elapsed: 0.087 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.dualTree.MRA2DDTU.<init>(MRA2DDTU.java:25)
+	at com.ericbarnhill.jmra.TestDualTreeThresh.MRA2DTUTest(TestDualTreeThresh.java:56)
+
+DualTree2DTest(com.ericbarnhill.jmra.TestDualTreeThresh)  Time elapsed: 0.002 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.TestDualTreeThresh.DualTree2DTest(TestDualTreeThresh.java:71)
+
+MRA2DTTest(com.ericbarnhill.jmra.TestDualTreeThresh)  Time elapsed: 0.001 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.dualTree.MRA2DDT.<init>(MRA2DDT.java:25)
+	at com.ericbarnhill.jmra.TestDualTreeThresh.MRA2DTTest(TestDualTreeThresh.java:39)
+

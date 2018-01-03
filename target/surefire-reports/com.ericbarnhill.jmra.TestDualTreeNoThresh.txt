@@ -1,4 +1,22 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestDualTreeNoThresh
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 169.096 sec - in com.ericbarnhill.jmra.TestDualTreeNoThresh
+Tests run: 4, Failures: 0, Errors: 4, Skipped: 0, Time elapsed: 0.003 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestDualTreeNoThresh
+DualTree3DSerialTest(com.ericbarnhill.jmra.TestDualTreeNoThresh)  Time elapsed: 0.001 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.TestDualTreeNoThresh.DualTree3DSerialTest(TestDualTreeNoThresh.java:94)
+
+MRA3DDTTest(com.ericbarnhill.jmra.TestDualTreeNoThresh)  Time elapsed: 0.001 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.TestDualTreeNoThresh.MRA3DDTTest(TestDualTreeNoThresh.java:71)
+
+DualTree2DTest(com.ericbarnhill.jmra.TestDualTreeNoThresh)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.dualTree.DualTree2DCplx.<init>(DualTree2DCplx.java:20)
+	at com.ericbarnhill.jmra.TestDualTreeNoThresh.DualTree2DTest(TestDualTreeNoThresh.java:53)
+
+MRA2DTTest(com.ericbarnhill.jmra.TestDualTreeNoThresh)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.dualTree.MRA2DDT.<init>(MRA2DDT.java:25)
+	at com.ericbarnhill.jmra.TestDualTreeNoThresh.MRA2DTTest(TestDualTreeNoThresh.java:33)
+

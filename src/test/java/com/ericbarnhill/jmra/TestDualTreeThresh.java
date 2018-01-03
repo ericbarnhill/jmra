@@ -20,6 +20,7 @@ import com.ericbarnhill.niftijio.*;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
+import java.net.URL;
 
 public class TestDualTreeThresh{
 
@@ -27,6 +28,10 @@ public class TestDualTreeThresh{
     @Test
     public void MRA2DTTest() {
         System.out.println("MRA2DDT Test");
+        System.out.println("File location:");
+        final URL codeSourceLocation =
+            this.getClass().getProtectionDomain().getCodeSource().getLocation();
+        System.out.println(codeSourceLocation);
         double[][] image = FilePaths.image2Array(FilePaths.image2D);
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();

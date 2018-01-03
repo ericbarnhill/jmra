@@ -23,7 +23,7 @@
     <dependency>
         <groupId>com.ericbarnhill</groupId>
         <artifactId>jvcl</artifactId>
-        <version>0.1</version>
+        <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>com.ericbarnhill</groupId>

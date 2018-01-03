@@ -1,4 +1,13 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestMRANoThresh
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.318 sec - in com.ericbarnhill.jmra.TestMRANoThresh
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.001 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestMRANoThresh
+MRA2DTest(com.ericbarnhill.jmra.TestMRANoThresh)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.MRA2D.<init>(MRA2D.java:66)
+	at com.ericbarnhill.jmra.TestMRANoThresh.MRA2DTest(TestMRANoThresh.java:27)
+
+MRA3DTest(com.ericbarnhill.jmra.TestMRANoThresh)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.ericbarnhill.jmra.TestMRANoThresh.MRA3DTest(TestMRANoThresh.java:46)
+
