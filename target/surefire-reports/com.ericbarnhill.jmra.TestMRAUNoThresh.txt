@@ -1,9 +1,13 @@
 -------------------------------------------------------------------------------
 Test set: com.ericbarnhill.jmra.TestMRAUNoThresh
 -------------------------------------------------------------------------------
+<<<<<<< Updated upstream
 Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 sec <<< FAILURE! - in com.ericbarnhill.jmra.TestMRAUNoThresh
 MRA2DUTest(com.ericbarnhill.jmra.TestMRAUNoThresh)  Time elapsed: 0 sec  <<< ERROR!
 java.lang.NullPointerException: null
 	at com.ericbarnhill.jmra.MRA2DU.<init>(MRA2DU.java:29)
 	at com.ericbarnhill.jmra.TestMRAUNoThresh.MRA2DUTest(TestMRAUNoThresh.java:31)
 
+=======
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.677 sec - in com.ericbarnhill.jmra.TestMRAUNoThresh
+>>>>>>> Stashed changes

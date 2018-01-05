@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
 <testsuite name="com.ericbarnhill.jmra.TestMRANoThresh" time="0" tests="2" errors="2" skipped="0" failures="0">
+=======
+<testsuite name="com.ericbarnhill.jmra.TestMRANoThresh" time="0.438" tests="2" errors="0" skipped="0" failures="0">
+>>>>>>> Stashed changes
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64"/>
@@ -58,6 +62,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
+<<<<<<< Updated upstream
   <testcase name="MRA2DTest" classname="com.ericbarnhill.jmra.TestMRANoThresh" time="0">
     <error type="java.lang.NullPointerException:"><![CDATA[java.lang.NullPointerException: null
 	at com.ericbarnhill.jmra.MRA2D.<init>(MRA2D.java:66)
@@ -74,4 +79,8 @@ Unsupported format or not found
     <system-out><![CDATA[MRA 3D Test
 ]]></system-out>
   </testcase>
+=======
+  <testcase name="MRA2DTest" classname="com.ericbarnhill.jmra.TestMRANoThresh" time="0.107"/>
+  <testcase name="MRA3DTest" classname="com.ericbarnhill.jmra.TestMRANoThresh" time="0.331"/>
+>>>>>>> Stashed changes
 </testsuite>

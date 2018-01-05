@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
 <testsuite name="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.09" tests="3" errors="3" skipped="0" failures="0">
+=======
+<testsuite name="com.ericbarnhill.jmra.TestDualTreeThresh" time="1.729" tests="3" errors="0" skipped="0" failures="0">
+>>>>>>> Stashed changes
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64"/>
@@ -58,6 +62,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
+<<<<<<< Updated upstream
   <testcase name="MRA2DTUTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.087">
     <error type="java.lang.NullPointerException:"><![CDATA[java.lang.NullPointerException: null
 	at com.ericbarnhill.jmra.dualTree.MRA2DDTU.<init>(MRA2DDTU.java:25)
@@ -86,4 +91,9 @@ file:/home/ericbarnhill/Documents/code/jmra/target/test-classes/
 Unsupported format or not found
 ]]></system-out>
   </testcase>
+=======
+  <testcase name="MRA2DTUTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.186"/>
+  <testcase name="DualTree2DTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="1.395"/>
+  <testcase name="MRA2DTTest" classname="com.ericbarnhill.jmra.TestDualTreeThresh" time="0.148"/>
+>>>>>>> Stashed changes
 </testsuite>

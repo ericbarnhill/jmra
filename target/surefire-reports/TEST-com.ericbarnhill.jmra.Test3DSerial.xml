@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
 <testsuite name="com.ericbarnhill.jmra.Test3DSerial" time="0.024" tests="2" errors="2" skipped="0" failures="0">
+=======
+<testsuite name="com.ericbarnhill.jmra.Test3DSerial" time="15.502" tests="2" errors="0" skipped="0" failures="0">
+>>>>>>> Stashed changes
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64"/>
@@ -58,6 +62,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
+<<<<<<< Updated upstream
   <testcase name="MRA3DUSerialTest" classname="com.ericbarnhill.jmra.Test3DSerial" time="0.016">
     <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
 	at com.ericbarnhill.jmra.Test3DSerial.MRA3DUSerialTest(Test3DSerial.java:55)
@@ -136,4 +141,8 @@
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:103)
 ]]></system-err>
   </testcase>
+=======
+  <testcase name="MRA3DUSerialTest" classname="com.ericbarnhill.jmra.Test3DSerial" time="14.499"/>
+  <testcase name="MRA3DSerialTest" classname="com.ericbarnhill.jmra.Test3DSerial" time="1.003"/>
+>>>>>>> Stashed changes
 </testsuite>

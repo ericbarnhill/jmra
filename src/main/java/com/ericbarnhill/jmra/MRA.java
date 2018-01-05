@@ -53,7 +53,11 @@ public abstract class MRA<N, B, V> {
      public MRA() {
      }
 
+<<<<<<< Updated upstream
      /** Constructor containing only convolution operator. */
+=======
+     /** Constructor giving access to convolution operations. */
+>>>>>>> Stashed changes
      public MRA(ConvolverFactory.ConvolutionType convType) {
         this.convType =  convType;
         upFirDn = new UpFirDn(convType); 
@@ -70,9 +74,13 @@ public abstract class MRA<N, B, V> {
         upFirDn = new UpFirDn(convType); 
     } 
 
+<<<<<<< Updated upstream
      /** full constructor, containing image, mask, filter bank, number of levels 
       * of the decomposition, and convolution type (CPU, GPU, or FFT)
       */
+=======
+    /** Base constructor */
+>>>>>>> Stashed changes
     public MRA(N origData, B maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this.origData = origData;
         this.maskData = maskData;
