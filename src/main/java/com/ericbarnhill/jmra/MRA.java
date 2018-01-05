@@ -53,17 +53,13 @@ public abstract class MRA<N, B, V> {
      public MRA() {
      }
 
-<<<<<<< Updated upstream
      /** Constructor containing only convolution operator. */
-=======
-     /** Constructor giving access to convolution operations. */
->>>>>>> Stashed changes
      public MRA(ConvolverFactory.ConvolutionType convType) {
         this.convType =  convType;
         upFirDn = new UpFirDn(convType); 
      }
 
-     /** for extensions that require a filter bank with different specifications */
+     /** Constructor for extensions that require a filter bank with different specifications */
     public MRA(N origData, B maskData, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this.origData = origData;
         this.maskData = maskData;
@@ -74,13 +70,9 @@ public abstract class MRA<N, B, V> {
         upFirDn = new UpFirDn(convType); 
     } 
 
-<<<<<<< Updated upstream
-     /** full constructor, containing image, mask, filter bank, number of levels 
+     /** Full constructor, containing image, mask, filter bank, number of levels 
       * of the decomposition, and convolution type (CPU, GPU, or FFT)
       */
-=======
-    /** Base constructor */
->>>>>>> Stashed changes
     public MRA(N origData, B maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
         this.origData = origData;
         this.maskData = maskData;
@@ -91,21 +83,21 @@ public abstract class MRA<N, B, V> {
         upFirDn = new UpFirDn(convType); 
     } 
 
-    /** perform discrete wavelet transform on image data */
+    /** Perform discrete wavelet transform on image data */
     final public void dwt() {
         for (int decompLvl = 0; decompLvl < decompLvls; decompLvl++) {
             decompose(decompLvl, 0);
         }
     }
 
-    /** perform inverse wavelet transform on image data */
+    /** Perform inverse wavelet transform on image data */
     final public void idwt() {
         for (int decompLvl = decompLvls-1; decompLvl >= 0; decompLvl--) {
             recompose(decompLvl, dimLvls-1);
         }
     }
 
-    /** implementation of recursive decomposition */
+    /** Implementation of recursive decomposition */
     public void decompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
@@ -122,10 +114,10 @@ public abstract class MRA<N, B, V> {
        }
     }
 
-    /** specifics of the decomposition are left abstract */
+    /** MRA-specific decomposition details */
     abstract public ArrayList<N> getDecomposition(int localIndex, int ind, int decompLvl, int dimLvl, int localStride);
 
-    /** implementation of recursive recomposition */
+    /** Implementation of recursive recomposition */
     public void recompose(int decompLvl, int dimLvl) {
         int localStride = (int)Math.pow(2, dimLvls - dimLvl);
         int localPair = localStride / 2;
@@ -142,34 +134,33 @@ public abstract class MRA<N, B, V> {
         }
     }
 
-    /** specifics of recomposition are left abstract */
+    /** MRA-specific recomposition details */
     abstract public N getRecomposition(int localPair, int ind, int decompLvl, int dimLvl, int localStride);
 
-    /** abstract method for the specific wavelet analysis used in the 
-     * decomposition
-     */
+    /** Wavelet-specific analysis */
     abstract public N analysis(N y, V filter, int decompLvl);
 
-    /** abstract method for the specific wavelet synthesis used in the
-     * recomposition
-     */
+    /** Wavelet-specific synthesis */
     abstract public N synthesis(N lo, N hi, V sfl, V sfh, int decompLvl); 
 
-    /** returns the image data of this MRA */
+    /** Returns the original data of this MRA */
     abstract public N getData(int index);
 
-    /** sets the image data of this MRA */
+    /** Sets the image data of this MRA */
     abstract public void setData(int index, N data);
 
+    /** Accepts thresholder.  */
     abstract public void accept(Threshold threshold);
 
+    /** Returns filtered data of this MRA. */
     abstract public N getFilteredData();
 
+    /** Returns wavelet decomposition of this MRA  as an ArrayList. */
     public ArrayList<N> getDecomposition() {
         return waveletData;
     }
 
-    public long nextPwr2(int n) {
+    long nextPwr2(int n) {
         double logn = Math.log(n) / Math.log(2);
         return (long)Math.pow(2,(int)Math.ceil(logn));
     }
