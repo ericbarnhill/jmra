@@ -1,3 +1,20 @@
+/* 
+ * Copyright (C) 2018 Eric Barnhill
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.ericbarnhill.jmra.dualTree;
 
 import java.util.ArrayList; 
@@ -6,6 +23,7 @@ import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.filters.*;
 
+/** 3D complex dual-tree analysis with serial data storage. */
 public class DualTree3DCplxSerial extends DualTree3DCplx {
 
     public DualTree3DCplxSerial(double[][][] origData, boolean[][][] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {

@@ -1,8 +1,26 @@
+/* 
+ * Copyright (C) 2018 Eric Barnhill
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.ericbarnhill.jmra.filters;
 
 import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.dualTree.*;
 
+/** Class of static methods that return popular wavelet filters. */
 public class Wavelets {
 
 
@@ -25,7 +43,6 @@ public class Wavelets {
         DTFilterBank farrasKingsbury = new DTFilterBank(faf1, faf2, fsf1, fsf2, af1, af2, sf1, sf2);
         return farrasKingsbury;
     }
-
 		
 	public static final double[] afLoNoTree = new double[] {
 		0, 0,
