@@ -155,12 +155,12 @@ public abstract class MRA<N, B, V> {
     /** Returns filtered data of this MRA. */
     abstract public N getFilteredData();
 
-    /** Returns wavelet decomposition of this MRA  as an ArrayList. */
+    /** Returns wavelet decomposition of this MRA as an ArrayList. */
     public ArrayList<N> getDecomposition() {
         return waveletData;
     }
 
-    long nextPwr2(int n) {
+    public long nextPwr2(int n) {
         double logn = Math.log(n) / Math.log(2);
         return (long)Math.pow(2,(int)Math.ceil(logn));
     }

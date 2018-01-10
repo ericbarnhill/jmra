@@ -74,4 +74,13 @@ public abstract class DualTree<N, B, V> {
         return origData;
     }
 
+    /** Returns wavelet decompositions from the trees */
+    public ArrayList<ArrayList<N>> getDecomposition() {
+        ArrayList<ArrayList<N>> decomposition = new ArrayList<ArrayList<N>>();
+        for (int i = 0; i < trees.size(); i++) {
+            decomposition.add(trees.get(i).getDecomposition());
+        }
+        return decomposition;
+    }
+
 }

@@ -22,11 +22,15 @@ import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.arrayMath.*;
 
-/** 1D 
+/** 1D dual-tree analysis. */ 
 public class DualTree1D extends DualTree<double[], boolean[], double[]> {
 
     public DualTree1D(double[] origData, boolean[] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
         super(origData, maskData, fb, decompLvls, convType, undecimated);
+    }
+
+    public DualTree1D(double[] origData, boolean[] maskData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, maskData, fb, decompLvls, convType, false);
     }
 
     public void setTrees() {

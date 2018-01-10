@@ -25,7 +25,7 @@ public class Test3DSerial{
         System.out.println("MRA 3D Serial Test");
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(FilePaths.nifti3D);
+            nv  = NiftiVolume.read(FileOps.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,7 +40,7 @@ public class Test3DSerial{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_serial.tif");
+        FileOps.data2Nifti(filteredData, FileOps.imgDir+"filtdata_3d_serial.tif");
     }
 
     @Test
@@ -48,7 +48,7 @@ public class Test3DSerial{
         System.out.println("MRA 3DU Serial Test");
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(FilePaths.nifti3D);
+            nv  = NiftiVolume.read(FileOps.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +63,7 @@ public class Test3DSerial{
         //mra.threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_serial_u.tif");
+        FileOps.data2Nifti(filteredData, FileOps.imgDir+"filtdata_3d_serial_u.tif");
     }
 }
         

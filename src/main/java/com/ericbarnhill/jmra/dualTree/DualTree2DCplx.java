@@ -38,6 +38,10 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
         this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length) , fb, decompLvls, convType, undecimated);
     }
 
+    public DualTree2DCplx(double[][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length) , fb, decompLvls, convType, false);
+    }
+
     @Override
     public void setTrees() {
         int[][] bankIndices = { {0, 0}, {1, 0}, {0, 0}, {1, 0}, {0, 1}, {1, 1}, {0, 1}, {1, 1} };
@@ -54,11 +58,12 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
             }
             banks.add(new DTFilterBank(faf, fsf, af, sf));
         }
+        double[][] normData = ArrayMath.divide(origData, 2); 
         for (DTFilterBank bank : banks) {
             if (undecimated) {
-                trees.add(new MRA2DDTU(origData, maskData, bank, decompLvls, convType));
+                trees.add(new MRA2DDTU(normData, maskData, bank, decompLvls, convType));
             } else {
-                trees.add(new MRA2DDT(origData, maskData, bank, decompLvls, convType));
+                trees.add(new MRA2DDT(normData, maskData, bank, decompLvls, convType));
             }
         }
     }
@@ -68,7 +73,8 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
         for (MRA<double[][], boolean[][], double[]> tree : trees) {
             bankSum = ArrayMath.add(bankSum, tree.getFilteredData());
         }
-        bankSum = ArrayMath.divide(bankSum, 2);
+        //bankSum = ArrayMath.divide(bankSum, 2);
+        bankSum = ArrayMath.divide(bankSum, 8);
         return bankSum;
     }
 
@@ -77,11 +83,11 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).dwt();
         }
-        //addSubtract(true);
+        addSubtract(true); // operation is the same in 2D, boolean added to fit interface
     }
 
     public void idwt() {
-        //addSubtract(false);
+        addSubtract(false); // operation is the same in 2D, boolean added to fit interface
         for (int i = 0; i < trees.size(); i++) {
             trees.get(i).idwt();
         }
@@ -119,8 +125,10 @@ public class DualTree2DCplx extends DualTree<double[][], boolean[][], double[]> 
 						ArrayMath.deepCopy(u),
 						ArrayMath.deepCopy(v)
 					),
-					Math.sqrt(2)
+				    Math.sqrt(2)
                 );
+        //double[][] p = ArrayMath.fillWithRandom(u.length, u[0].length);
+        //double[][] m = ArrayMath.fillWithRandom(u.length, u[0].length);
 		ArrayList<double[][]> pm = new ArrayList<double[][]>();
 		pm.add(p);
 		pm.add(m);

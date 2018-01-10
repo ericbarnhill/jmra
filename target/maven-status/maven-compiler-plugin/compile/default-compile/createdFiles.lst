@@ -4,12 +4,11 @@ com/ericbarnhill/jmra/dualTree/DualTree1D.class
 com/ericbarnhill/jmra/dualTree/DualTree3DCplxSerial.class
 com/ericbarnhill/jmra/Threshold$ThreshMeth.class
 com/ericbarnhill/jmra/Threshold.class
-com/ericbarnhill/jmra/FilePaths.class
+com/ericbarnhill/jmra/FileOps.class
 com/ericbarnhill/jmra/Threshold$NoiseEstMeth.class
 com/ericbarnhill/jmra/dualTree/MRA1DDTU.class
 com/ericbarnhill/jmra/MRA3DU.class
 com/ericbarnhill/jmra/dualTree/DTFilterBank.class
-com/ericbarnhill/jmra/NDData.class
 com/ericbarnhill/jmra/MRA2D.class
 com/ericbarnhill/jmra/MRA1D.class
 com/ericbarnhill/jmra/Threshold$1.class
@@ -30,6 +29,5 @@ com/ericbarnhill/jmra/filters/FilterPair.class
 com/ericbarnhill/jmra/MRA1DU.class
 com/ericbarnhill/jmra/dualTree/MRA2DDT.class
 com/ericbarnhill/jmra/dualTree/MRA3DDTU.class
-com/ericbarnhill/jmra/Visualizer.class
 com/ericbarnhill/jmra/MRA3DSerial.class
 com/ericbarnhill/jmra/dualTree/DualTree3DCplx.class

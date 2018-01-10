@@ -25,14 +25,14 @@ import java.net.URL;
 public class TestDualTreeThresh{
 
 
-    @Test
+    @Ignore
     public void MRA2DTTest() {
         System.out.println("MRA2DDT Test");
         System.out.println("File location:");
         final URL codeSourceLocation =
             this.getClass().getProtectionDomain().getCodeSource().getLocation();
         System.out.println(codeSourceLocation);
-        double[][] image = FilePaths.image2Array(FilePaths.image2D);
+        double[][] image = FileOps.image2Array(FileOps.image2D);
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
@@ -42,14 +42,14 @@ public class TestDualTreeThresh{
         
         mra.idwt();
         image = mra.getFilteredData();
-        String resultFile = FilePaths.root + "lena_mra2ddt_idwt.tif";
-        FilePaths.array2Image(image, resultFile);
+        String resultFile = FileOps.imgDir + "lena_mra2ddt_idwt.tif";
+        FileOps.data2Image(image, resultFile);
     }
 
-    @Test
+    @Ignore
     public void MRA2DTUTest() {
         System.out.println("MRA2DDTU Test");
-        double[][] image = FilePaths.image2Array(FilePaths.image2D);
+        double[][] image = FileOps.image2Array(FileOps.image2D);
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
@@ -58,14 +58,14 @@ public class TestDualTreeThresh{
         List<double[][]> decomp = mra.getDecomposition();
         mra.idwt();
         image = mra.getFilteredData();
-        String resultFile = FilePaths.root + "lena_dtu_idwt.tif";
-        FilePaths.array2Image(image, resultFile);
+        String resultFile = FileOps.imgDir + "lena_dtu_idwt.tif";
+        FileOps.data2Image(image, resultFile);
     }
 
-    @Test
+    @Ignore
     public void DualTree2DTest() {
         System.out.println("Thresh DT2D");
-        double[][] image = FilePaths.image2Array(FilePaths.image2D);
+        double[][] image = FileOps.image2Array(FileOps.image2D);
         // PREP MRA
         DTFilterBank fb = Wavelets.getFarrasKingsbury();
         double[][] noise = ArrayMath.multiply(ArrayMath.fillWithRandom(image.length, image[0].length),100);
@@ -76,15 +76,15 @@ public class TestDualTreeThresh{
         dt.accept(t);
         dt.idwt();
         image = dt.getFilteredData();
-        String resultFile = FilePaths.root + "lena_mra2ddtu_idwt_thresh.tif";
-        FilePaths.array2Image(image, resultFile);
+        String resultFile = FileOps.imgDir + "lena_mra2ddtu_idwt_thresh.tif";
+        FileOps.data2Image(image, resultFile);
     }
 
     @Ignore
     public void MRA3DDTTest() {
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(FilePaths.nifti3D);
+            nv  = NiftiVolume.read(FileOps.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,7 +99,7 @@ public class TestDualTreeThresh{
         ArrayList<double[][][]> decomp = mra.getDecomposition();
         mra.idwt();
         double[][][] filteredData = mra.getFilteredData();
-        FilePaths.data2File(filteredData, FilePaths.root+"filtdata_3d_u.tif");
+        FileOps.data2Nifti(filteredData, FileOps.imgDir+"filtdata_3d_u.tif");
     }
 
     @Ignore
@@ -108,7 +108,7 @@ public class TestDualTreeThresh{
         System.out.println("Dualtree 3D non serial with thresh");
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(FilePaths.nifti3D);
+            nv  = NiftiVolume.read(FileOps.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,13 +119,12 @@ public class TestDualTreeThresh{
         //double[][] noise = ArrayMath.fillWithRandom(image.length, image[0].length);
         DualTree3DCplx dt = new DualTree3DCplx(image, fb, 3, ConvolverFactory.ConvolutionType.FDCPU, true);
         dt.dwt();
-        Visualizer.dumpDecomposition(dt);
         Threshold threshold = new Threshold(Threshold.ThreshMeth.SOFT, Threshold.NoiseEstMeth.VISU_SHRINK);
         threshold.visit(dt);
         dt.idwt();
         image = dt.getFilteredData();
-        String resultFile = FilePaths.root + "dualtree3d_nonserial_thresh.tif";
-        FilePaths.data2File(image, resultFile);
+        String resultFile = FileOps.imgDir + "dualtree3d_nonserial_thresh.tif";
+        FileOps.data2Nifti(image, resultFile);
         long t2 = System.currentTimeMillis();
         System.out.println("Time unserialized " + ((t2-t1)/1000) + " sec");
 

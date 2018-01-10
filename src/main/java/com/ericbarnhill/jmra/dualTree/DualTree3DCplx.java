@@ -23,7 +23,6 @@ import com.ericbarnhill.jvcl.*;
 import com.ericbarnhill.jmra.*;
 import com.ericbarnhill.jmra.filters.*;
 
-/** 3D complex dual-tree analysis. */
 public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double[]> {
 
     int stride;
@@ -36,6 +35,10 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
 
     public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType, boolean undecimated) {
         this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), fb, decompLvls, convType, undecimated);
+    }
+
+    public DualTree3DCplx(double[][][] origData, DTFilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
+        this(origData, ArrayMath.fillWithTrue(origData.length, origData[0].length, origData[0][0].length), fb, decompLvls, convType, true);
     }
 
     public DualTree3DCplx(double[][][] origData) {
@@ -68,12 +71,12 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
     }
 
     public double[][][] getFilteredData() {
-        System.out.println("in dualtree get filtered data");
         double[][][] bankSum = new double[origData.length][origData[0].length][origData[0][0].length];
         for (MRA<double[][][], boolean[][][], double[]> tree : trees) {
             bankSum = ArrayMath.add(bankSum, tree.getFilteredData());
         }
         bankSum = ArrayMath.divide(bankSum, Math.sqrt(8));
+        //bankSum = ArrayMath.divide(bankSum, 8);
         return bankSum;
     }
 

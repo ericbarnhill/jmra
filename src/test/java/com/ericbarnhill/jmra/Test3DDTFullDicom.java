@@ -29,7 +29,7 @@ public class Test3DDTFullDicom{
         System.out.println("DT3D Full Dicom");
         NiftiVolume nv = null;
         try {
-            nv  = NiftiVolume.read(FilePaths.nifti3D);
+            nv  = NiftiVolume.read(FileOps.nifti3D);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,8 +45,8 @@ public class Test3DDTFullDicom{
 
         dt.idwt();
         image = dt.getFilteredData();
-        String resultFile = FilePaths.root + "dualtree3d_fulldicom.tif";
-        FilePaths.data2File(image, resultFile);
+        String resultFile = FileOps.imgDir + "dualtree3d_fulldicom.tif";
+        FileOps.data2Nifti(image, resultFile);
         long t2 = System.currentTimeMillis();
         System.out.println("Time for fullsize dicom processing:  " + ((t2-t1)/1000) + " sec");
 

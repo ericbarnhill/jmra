@@ -180,7 +180,7 @@ public class MRA2D extends MRA<double[][], boolean[][], double[]> {
     }
 
     // for debugging and testing
-    public void data2File(double[][] data, String path) {
+    public void data2Nifti(double[][] data, String path) {
         int w = data.length;
         int h = data[0].length;
         FloatProcessor fp = new FloatProcessor(w,h);
