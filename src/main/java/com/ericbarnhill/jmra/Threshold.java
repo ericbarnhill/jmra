@@ -26,7 +26,7 @@ import com.ericbarnhill.arrayMath.ArrayMath;
 import org.apache.commons.math4.stat.descriptive.rank.Max;
 import org.apache.commons.math4.stat.descriptive.rank.Min;
 import org.apache.commons.math4.stat.descriptive.rank.Median;
-import org.apache.commons.math4.stat.descriptive.moment.Mean;
+import org.apache.commons.math4.stat.descriptive.moment.Variance;
 import org.apache.commons.numbers.complex.Complex;
 import org.apache.commons.numbers.complex.ComplexUtils;
 import com.ericbarnhill.jmra.dualTree.*;
@@ -34,16 +34,24 @@ import com.ericbarnhill.jmra.dualTree.*;
 /** Apply wavelet thresholding to an MRA. Follows Visitor design pattern. */
 public class Threshold {
 
-    public  enum ThreshMeth {
+    double sigma;
+
+    public enum ThreshMeth {
         HARD, SOFT, NNG
     }
 
-    public  enum NoiseEstMeth {
-        VISU_SHRINK, SURE_SHRINK, BAYES_SHRINK
+    public enum NoiseEstMeth {
+        KNOWN, VISU_SHRINK, SURE_SHRINK, BAYES_SHRINK
     }
 
     ThreshMeth threshMeth;
     NoiseEstMeth noiseEstMeth;
+    
+    public Threshold(ThreshMeth threshMeth, double sigma) {
+        this.threshMeth = threshMeth;
+        this.noiseEstMeth = NoiseEstMeth.KNOWN;
+        this.sigma = sigma;
+    }
     
     public Threshold(ThreshMeth threshMeth, NoiseEstMeth noiseEstMeth) {
         this.threshMeth = threshMeth;
@@ -53,7 +61,7 @@ public class Threshold {
     public void visit(MRA1D mra1d) {
         // loop through each subband, pass method
         for (int i = 0; i < mra1d.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra1d.stride != 0) {
                 int level = (int)Math.floor(i / mra1d.stride);
                 boolean[] maskDownsampled = ArrayMath.decimate(mra1d.paddedMask, (int)Math.pow(2,level));
@@ -65,7 +73,7 @@ public class Threshold {
     public void visit(MRA1DU mra1du) {
         // loop through each subband, pass method
         for (int i = 0; i < mra1du.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra1du.stride != 0) {
                 int level = (int)Math.floor(i / mra1du.stride);
                 mra1du.waveletData.set(i, threshold(mra1du.waveletData.get(i), mra1du.maskData));
@@ -76,7 +84,7 @@ public class Threshold {
     public void visit (MRA2D mra2d) {
         // loop through each subband, pass method
         for (int i = 0; i < mra2d.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra2d.stride != 0) {
                 int level = (int)Math.floor(i / mra2d.stride);
                 int decimFac = (int)Math.pow(2, level+1);
@@ -96,7 +104,7 @@ public class Threshold {
     public void visit(MRA2DU mra2du) {
         // loop through each subband, pass method
         for (int i = 0; i < mra2du.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra2du.stride != 0) {
                 int level = (int)Math.floor(i / mra2du.stride);
                 double[] waveletVec = ArrayMath.vectorize(mra2du.waveletData.get(i));
@@ -114,7 +122,7 @@ public class Threshold {
     public void visit(MRA3D mra3d) {
         // loop through each subband, pass method
         for (int i = 0; i < mra3d.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra3d.stride != 0) {
                 int level = (int)Math.floor(i / mra3d.stride);
                 int decimFac = (int)Math.pow(2, level+1);
@@ -134,7 +142,7 @@ public class Threshold {
     public void visit(MRA3DU mra3du) {
         // loop through each subband, pass method
         for (int i = 0; i < mra3du.waveletData.size(); i++) {
-            // avoid scaling datas
+            // avoid scaling images
             if (i % mra3du.stride != 0) {
                 int level = (int)Math.floor(i / mra3du.stride);
                 double[] waveletVec = ArrayMath.vectorize(mra3du.waveletData.get(i));
@@ -212,18 +220,19 @@ public class Threshold {
         }
     }
 
-    public  double[] threshold(double[] data, boolean[] mask) {
-        double sigma = estimateSigma(data, mask);
+    public double[] threshold(double[] data, boolean[] mask) {
+        estimateSigma(ArrayMath.deepCopy(data), mask);
+        // DEBUGGING +
+        //System.out.println("in threshold data range: Max " + new Max().evaluate(data) + 
+        //        " Min " + new Min().evaluate(data));
+        // DEBUGGING -
         double[] thresholdedPixels = applyThresh(data, sigma);
         return thresholdedPixels;
     }
 
     // estimate the noise using the real component of the tree
     public Complex[] threshold(Complex[] data, boolean[] mask) {
-        double sigma = estimateSigma(ComplexUtils.complex2Real(data), mask);
-        // DEBUGGING +
-        // System.out.println("sigma : " + sigma);
-        // DEBUGGING -
+        estimateSigma(ComplexUtils.complex2Real(data), mask);
         Complex[] thresholdedPixels = applyThresh(data, sigma);
         return thresholdedPixels;
     }
@@ -294,14 +303,15 @@ public class Threshold {
         return ArrayUtils.toPrimitive(maskedPixelsList.toArray(new Double[0]));
     }
 
-    public  double estimateSigma(double[] data, boolean[] mask) {
+    public void estimateSigma(double[] data, boolean[] mask) {
         double[] maskedPixels = maskPixels(data, mask);
-        double sigma = 0;
         int N = maskedPixels.length;
             double robustNoiseEst = noiseEst(data);
                 switch (noiseEstMeth) {
+            case KNOWN:
+                break;
             case VISU_SHRINK:
-                sigma = universalThreshold(maskedPixels, robustNoiseEst);
+                this.sigma = universalThreshold(maskedPixels, robustNoiseEst);
                 break;
             case SURE_SHRINK:
                 // hybrid scheme of Donoho et al
@@ -328,7 +338,7 @@ public class Threshold {
                             minRiskIndex = n;
                         }
                     }
-                    sigma = Math.sqrt(sortedPixels[minRiskIndex])*robustNoiseEst;
+                    this.sigma = Math.sqrt(sortedPixels[minRiskIndex])*robustNoiseEst;
                     System.out.format("%1.4f %1.4f %1.4f \n", robustNoiseEst, sigma, cumSum);
                 }
                 break;
@@ -338,13 +348,13 @@ public class Threshold {
                 double sig2y = ArrayMath.sum(ArrayMath.square(maskedPixels)) / N;
                 double sigX = Math.sqrt(Math.max(sig2y - sigHat*sigHat, 0));
                 if (sigX == 0) {
-                    sigma = new Max().evaluate(maskedPixels);
+                    this.sigma = new Max().evaluate(maskedPixels);
                 } else {
-                    sigma = sigHat*sigHat / sigX;
+                    this.sigma = sigHat*sigHat / sigX;
                 }
                 break;
         }
-        return sigma;
+        return;
     }
 
     private  double universalThreshold(double[] maskedPixels, double noiseEst) {
@@ -352,12 +362,6 @@ public class Threshold {
     }
 
     private  double noiseEst(double[] pixels) {
-        // DEBUGGING +
-        // System.out.println("Min: " + new Min().evaluate(ArrayMath.abs(pixels)));
-        // System.out.println("Max: " + new Max().evaluate(ArrayMath.abs(pixels)));
-        // System.out.println("Mean: " + new Mean().evaluate(ArrayMath.abs(pixels)));
-        // System.out.println("Median: " + new Median().evaluate(ArrayMath.abs(pixels)));
-        // DEBUGGING -
         return new Median().evaluate(ArrayMath.abs(pixels))/0.6745;
     }
 

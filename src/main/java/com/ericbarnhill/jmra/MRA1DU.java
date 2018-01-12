@@ -46,10 +46,16 @@ public class MRA1DU extends MRA1D {
         int N = sfl.length + sfh.length;
         lo = upFirDn.upFirDn(lo, sflATrous, 1, 1);
         hi = upFirDn.upFirDn(hi, sfhATrous, 1, 1);
-        // in undec, crop the lo to fit the hiva arrays copy of range
+        // in undec, crop the lo to fit the hi arrays copy of range
         lo = Arrays.copyOfRange(lo, 0, hi.length);
         double[] y = ArrayMath.add(lo, hi);
-        y = Arrays.copyOfRange(y, M*(N/2-1), y.length - M*(N/2-1)); 
+        try {
+            y = Arrays.copyOfRange(y, M*(N/2-1), y.length - M*(N/2-1)); 
+        } catch (Exception e) {
+            throw new RuntimeException("Error in synthesis -- perhaps too many " +
+                    "decomposition levels for the dimensions?");
+        }
+        
         return y;
     }
 

@@ -28,7 +28,7 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
-import org.apache.commons.math4.stat.descriptive.moment.Mean;
+import org.apache.commons.math4.stat.descriptive.moment.Variance;
 
 /** 3D undecimated multi-resolution analysis with serial data processing. */
 public class MRA3DUSerial extends MRA3DSerial {

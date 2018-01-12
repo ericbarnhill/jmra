@@ -28,7 +28,7 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
 import ij.process.FloatProcessor;
-import org.apache.commons.math4.stat.descriptive.moment.Mean;
+import org.apache.commons.math4.stat.descriptive.moment.Variance;
 
 /** Undecimated 3D multi-resolution analysis. */
 public class MRA3DU extends MRA3D {

@@ -47,7 +47,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
 
     @Override
     public void setTrees() {
-        int[][] bankIndices = { {0, 0, 0}, {1, 0, 0}, {0, 0, 1}, {1, 0, 1}, {0, 1, 0}, {1, 1, 0}, {0, 1, 1}, {1, 1, 1} };
+        int[][] bankIndices = { {0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 1, 0}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1} };
         for (int[] indices : bankIndices) {
             ArrayList<FilterPair> faf = new ArrayList<FilterPair>();
             ArrayList<FilterPair> fsf = new ArrayList<FilterPair>();
@@ -76,7 +76,7 @@ public class DualTree3DCplx extends DualTree<double[][][], boolean[][][], double
             bankSum = ArrayMath.add(bankSum, tree.getFilteredData());
         }
         bankSum = ArrayMath.divide(bankSum, Math.sqrt(8));
-        //bankSum = ArrayMath.divide(bankSum, 8);
+        //bankSum = ArrayMath.divide(bankSum, 16);
         return bankSum;
     }
 
