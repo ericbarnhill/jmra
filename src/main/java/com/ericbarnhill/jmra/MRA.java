@@ -48,12 +48,11 @@ public abstract class MRA<N, B, V> {
      public ConvolverFactory.ConvolutionType convType;
      public UpFirDn upFirDn;
 
-
-     /** Empty constructor. */
+     /** Empty constructor */
      public MRA() {
      }
 
-     /** Constructor containing only convolution operator. */
+     /** Constructor containing only convolution operator */
      public MRA(ConvolverFactory.ConvolutionType convType) {
         this.convType =  convType;
         upFirDn = new UpFirDn(convType); 
@@ -70,7 +69,8 @@ public abstract class MRA<N, B, V> {
         upFirDn = new UpFirDn(convType); 
     } 
 
-     /** Full constructor, containing image, mask, filter bank, number of levels 
+     /** 
+      * Full constructor, containing image, mask, filter bank, number of levels 
       * of the decomposition, and convolution type (CPU, GPU, or FFT)
       */
     public MRA(N origData, B maskData, FilterBank fb, int decompLvls, ConvolverFactory.ConvolutionType convType) {
@@ -149,7 +149,7 @@ public abstract class MRA<N, B, V> {
     /** Sets the image data of this MRA */
     abstract public void setData(int index, N data);
 
-    /** Accepts thresholder.  */
+    /** Accepts thresholder */
     abstract public void accept(Threshold threshold);
 
     /** Returns filtered data of this MRA. */

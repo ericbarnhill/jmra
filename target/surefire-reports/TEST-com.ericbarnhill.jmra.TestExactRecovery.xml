@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.ericbarnhill.jmra.TestExactRecovery" time="13.227" tests="5" errors="0" skipped="0" failures="0">
+<testsuite name="com.ericbarnhill.jmra.TestExactRecovery" time="20.93" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64"/>
@@ -41,7 +41,7 @@
     <property name="java.vm.specification.version" value="1.8"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/usr/lib/jvm/java-8-openjdk-amd64/jre"/>
-    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher package"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher test"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
     <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
@@ -58,9 +58,9 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="MRA2DTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.405"/>
-  <testcase name="MRA3DTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.577"/>
-  <testcase name="MRA2DUTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.111"/>
-  <testcase name="MRA3DUTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="11.423"/>
-  <testcase name="MRA2DDTTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.711"/>
+  <testcase name="MRA2DTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.584"/>
+  <testcase name="MRA3DTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.763"/>
+  <testcase name="MRA2DUTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.124"/>
+  <testcase name="MRA3DUTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="18.522"/>
+  <testcase name="MRA2DDTTest" classname="com.ericbarnhill.jmra.TestExactRecovery" time="0.937"/>
 </testsuite>
